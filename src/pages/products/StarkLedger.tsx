@@ -20,7 +20,7 @@ const StarkLedger = () => {
           {/* Back Link */}
           <Link to="/products" className="inline-flex items-center text-muted-foreground hover:text-foreground transition-colors mb-8">
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Platforms
+            Back to Products
           </Link>
 
           {/* Header */}
@@ -75,8 +75,8 @@ const StarkLedger = () => {
             <h2 className="font-display text-2xl font-semibold mb-3">Coming Soon</h2>
             <p className="text-muted-foreground">
               StarkLedger is currently in active development. Contact us at{" "}
-              <a href="mailto:contact@starklabs.in" className="text-primary hover:underline">
-                contact@starklabs.in
+              <a href="mailto:starklabs.in@gmail.com" className="text-primary hover:underline">
+                starklabs.in@gmail.com
               </a>{" "}
               to learn more or request early access.
             </p>

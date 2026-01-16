@@ -9,7 +9,7 @@ const Navbar = () => {
 
   const navItems = [
     { label: "About", href: "#about" },
-    { label: "Platforms", href: "/products" },
+    { label: "Products", href: "/products" },
     { label: "Contact", href: "#contact" },
   ];
 
@@ -59,7 +59,7 @@ const Navbar = () => {
             ))}
             <Link to="/products">
               <Button className="glow-effect">
-                Explore Platforms
+                Explore Products
               </Button>
             </Link>
           </div>
@@ -105,7 +105,7 @@ const Navbar = () => {
               ))}
               <Link to="/products" onClick={() => setIsOpen(false)}>
                 <Button className="glow-effect w-full">
-                  Explore Platforms
+                  Explore Products
                 </Button>
               </Link>
             </div>

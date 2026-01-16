@@ -56,15 +56,15 @@ const Hero = () => {
           >
             <Link to="/products">
               <Button size="lg" className="glow-effect text-lg px-8 py-6">
-                Explore Platforms
+                Explore Products
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
             </Link>
-            <Link to="#contact">
+            <a href="#contact">
               <Button variant="outline" size="lg" className="text-lg px-8 py-6 border-border hover:bg-secondary">
                 Contact Starklabs
               </Button>
-            </Link>
+            </a>
           </motion.div>
         </div>
       </div>
