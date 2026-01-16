@@ -11,7 +11,7 @@ import StarkLedger from "./pages/products/StarkLedger";
 import CompetitiveHabitTracker from "./pages/products/CompetitiveHabitTracker";
 import NeuralTarot from "./pages/products/NeuralTarot";
 import NotFound from "./pages/NotFound";
-import ArcReactorLoader from "./components/ArcReactorLoader";
+import ReactorIgnition from "./components/ReactorIgnition";
 import CustomCursor from "./components/CustomCursor";
 
 const queryClient = new QueryClient();
@@ -24,10 +24,10 @@ const App = () => {
       <TooltipProvider>
         <Toaster />
         <Sonner />
-        <CustomCursor />
+        {!isLoading && <CustomCursor />}
         <AnimatePresence mode="wait">
           {isLoading && (
-            <ArcReactorLoader onComplete={() => setIsLoading(false)} />
+            <ReactorIgnition onComplete={() => setIsLoading(false)} />
           )}
         </AnimatePresence>
         <BrowserRouter>
