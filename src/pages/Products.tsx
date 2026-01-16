@@ -30,7 +30,7 @@ const products = [
   {
     icon: Rocket,
     title: "More Coming Soon",
-    description: "We're constantly building new AI engineering tools and platforms. Stay tuned for upcoming releases that push the boundaries of what's possible.",
+    description: "We're constantly building new AI engineering tools and products. Stay tuned for upcoming releases that push the boundaries of what's possible.",
     link: "/products",
     status: "Upcoming",
   },
@@ -57,7 +57,7 @@ const Products = () => {
             className="text-center mb-16"
           >
             <h1 className="font-display text-4xl md:text-6xl font-bold mb-4">
-              Our <span className="gradient-text">Platforms</span>
+              Our <span className="gradient-text">Products</span>
             </h1>
             <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
               Production-grade AI products engineered for real-world impact.

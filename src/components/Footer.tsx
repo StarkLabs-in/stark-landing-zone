@@ -22,7 +22,7 @@ const Footer = () => {
               Home
             </Link>
             <Link to="/products" className="text-muted-foreground hover:text-foreground transition-colors">
-              Platforms
+              Products
             </Link>
             <a href="#contact" className="text-muted-foreground hover:text-foreground transition-colors">
               Contact

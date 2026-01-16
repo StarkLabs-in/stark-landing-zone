@@ -24,7 +24,7 @@ const projects = [
   },
   {
     icon: Rocket,
-    title: "Future Platforms",
+    title: "Future Products",
     description: "Upcoming AI engineering tools by Starklabs. We're constantly building new solutions for emerging challenges.",
     link: "/products",
   },
@@ -32,7 +32,7 @@ const projects = [
 
 const Projects = () => {
   return (
-    <section id="platforms" className="py-24 relative">
+    <section id="products" className="py-24 relative">
       {/* Background Accent */}
       <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
       
@@ -46,7 +46,7 @@ const Projects = () => {
           className="text-center mb-16"
         >
           <h2 className="font-display text-3xl md:text-5xl font-bold mb-4">
-            Our <span className="gradient-text">Platforms</span>
+            Our <span className="gradient-text">Products</span>
           </h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
             Production-grade AI products designed to solve real problems at scale.
