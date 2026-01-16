@@ -1,11 +1,10 @@
 import { motion } from "framer-motion";
-import { ArrowRight, Mail, MapPin, Phone } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Mail, MapPin, Github, Globe } from "lucide-react";
 
 const Contact = () => {
   return (
-    <section id="contact" className="py-32 relative">
-      {/* Background Gradient */}
+    <section id="contact" className="py-24 relative">
+      {/* Background */}
       <div className="absolute inset-0 bg-gradient-to-b from-background via-secondary/30 to-background" />
 
       <div className="container mx-auto px-6 relative z-10">
@@ -16,50 +15,67 @@ const Contact = () => {
           transition={{ duration: 0.6 }}
           className="max-w-4xl mx-auto text-center"
         >
-          <h2 className="font-display text-4xl md:text-5xl font-bold mb-6">
-            Ready to <span className="gradient-text">Collaborate?</span>
+          <h2 className="font-display text-3xl md:text-5xl font-bold mb-4">
+            Get in <span className="gradient-text">Touch</span>
           </h2>
           <p className="text-muted-foreground text-lg mb-12 max-w-2xl mx-auto">
-            Whether you're a researcher, investor, or visionary company, we're always 
-            looking for partners who share our passion for innovation.
+            Ready to build production-grade AI systems? Let's discuss how Starklabs can help.
           </p>
 
-          {/* CTA Box */}
+          {/* Contact Box */}
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="bg-card border border-border rounded-3xl p-10 glow-effect"
+            className="bg-card border border-border rounded-3xl p-10"
           >
-            <div className="grid md:grid-cols-3 gap-8 mb-10">
-              <div className="flex flex-col items-center text-center">
-                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-                  <Mail className="w-5 h-5 text-primary" />
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
+              <a 
+                href="mailto:contact@starklabs.in"
+                className="flex flex-col items-center text-center group"
+              >
+                <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
+                  <Mail className="w-6 h-6 text-primary" />
                 </div>
-                <span className="text-sm text-muted-foreground mb-1">Email Us</span>
-                <span className="text-foreground font-medium">contact@starklabs.io</span>
-              </div>
-              <div className="flex flex-col items-center text-center">
-                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-                  <Phone className="w-5 h-5 text-primary" />
+                <span className="text-sm text-muted-foreground mb-1">Email</span>
+                <span className="text-foreground font-medium group-hover:text-primary transition-colors">contact@starklabs.in</span>
+              </a>
+              
+              <a 
+                href="https://github.com/StarkLabs-in"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex flex-col items-center text-center group"
+              >
+                <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
+                  <Github className="w-6 h-6 text-primary" />
                 </div>
-                <span className="text-sm text-muted-foreground mb-1">Call Us</span>
-                <span className="text-foreground font-medium">+1 (555) 123-4567</span>
-              </div>
-              <div className="flex flex-col items-center text-center">
-                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-                  <MapPin className="w-5 h-5 text-primary" />
+                <span className="text-sm text-muted-foreground mb-1">GitHub</span>
+                <span className="text-foreground font-medium group-hover:text-primary transition-colors">StarkLabs-in</span>
+              </a>
+              
+              <a 
+                href="https://starklabs.in"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex flex-col items-center text-center group"
+              >
+                <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
+                  <Globe className="w-6 h-6 text-primary" />
                 </div>
-                <span className="text-sm text-muted-foreground mb-1">Visit Us</span>
-                <span className="text-foreground font-medium">Silicon Valley, CA</span>
+                <span className="text-sm text-muted-foreground mb-1">Website</span>
+                <span className="text-foreground font-medium group-hover:text-primary transition-colors">starklabs.in</span>
+              </a>
+              
+              <div className="flex flex-col items-center text-center">
+                <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                  <MapPin className="w-6 h-6 text-primary" />
+                </div>
+                <span className="text-sm text-muted-foreground mb-1">Location</span>
+                <span className="text-foreground font-medium">India (Global Delivery)</span>
               </div>
             </div>
-
-            <Button size="lg" className="glow-effect text-lg px-10 py-6">
-              Schedule a Visit
-              <ArrowRight className="ml-2 w-5 h-5" />
-            </Button>
           </motion.div>
         </motion.div>
       </div>

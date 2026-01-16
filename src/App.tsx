@@ -4,6 +4,10 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
+import Products from "./pages/Products";
+import StarkLedger from "./pages/products/StarkLedger";
+import CompetitiveHabitTracker from "./pages/products/CompetitiveHabitTracker";
+import NeuralTarot from "./pages/products/NeuralTarot";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -16,6 +20,10 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/products" element={<Products />} />
+          <Route path="/products/starkledger" element={<StarkLedger />} />
+          <Route path="/products/competitive-habit-tracker" element={<CompetitiveHabitTracker />} />
+          <Route path="/products/neural-tarot" element={<NeuralTarot />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
