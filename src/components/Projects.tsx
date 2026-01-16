@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { ArrowRight, FileText, Target, Stars, Rocket } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import MagneticElement from "./MagneticElement";
 
 const projects = [
   {
@@ -64,23 +65,27 @@ const Projects = () => {
               transition={{ duration: 0.5, delay: index * 0.1 }}
               className="group"
             >
-              <div className="h-full p-8 rounded-2xl bg-card border border-border hover:border-primary/50 transition-all duration-300 card-glow flex flex-col">
-                <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center mb-6 group-hover:bg-primary/20 transition-colors">
-                  <project.icon className="w-7 h-7 text-primary" />
+              <MagneticElement intensity={0.15} className="h-full">
+                <div className="h-full p-8 rounded-2xl bg-card border border-border hover:border-primary/50 transition-all duration-300 card-glow flex flex-col">
+                  <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center mb-6 group-hover:bg-primary/20 transition-colors">
+                    <project.icon className="w-7 h-7 text-primary" />
+                  </div>
+                  <h3 className="font-display text-2xl font-semibold mb-3 text-foreground">
+                    {project.title}
+                  </h3>
+                  <p className="text-muted-foreground leading-relaxed mb-6 flex-grow">
+                    {project.description}
+                  </p>
+                  <MagneticElement intensity={0.2}>
+                    <Link to={project.link}>
+                      <Button variant="outline" className="w-full border-border hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all">
+                        Learn More
+                        <ArrowRight className="ml-2 w-4 h-4" />
+                      </Button>
+                    </Link>
+                  </MagneticElement>
                 </div>
-                <h3 className="font-display text-2xl font-semibold mb-3 text-foreground">
-                  {project.title}
-                </h3>
-                <p className="text-muted-foreground leading-relaxed mb-6 flex-grow">
-                  {project.description}
-                </p>
-                <Link to={project.link}>
-                  <Button variant="outline" className="w-full border-border hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all">
-                    Learn More
-                    <ArrowRight className="ml-2 w-4 h-4" />
-                  </Button>
-                </Link>
-              </div>
+              </MagneticElement>
             </motion.div>
           ))}
         </div>
