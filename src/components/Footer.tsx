@@ -1,66 +1,48 @@
-import { Github, Linkedin, Twitter } from "lucide-react";
+import { Github } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const Footer = () => {
-  const links = {
-    Research: ["AI Lab", "Quantum Lab", "Energy Lab", "Publications"],
-    Company: ["About Us", "Careers", "News", "Partners"],
-    Legal: ["Privacy Policy", "Terms of Service", "Security"],
-  };
-
   return (
     <footer className="border-t border-border bg-card/50">
-      <div className="container mx-auto px-6 py-16">
-        <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-10">
+      <div className="container mx-auto px-6 py-12">
+        <div className="flex flex-col md:flex-row justify-between items-center gap-8">
           {/* Brand */}
-          <div className="lg:col-span-2">
-            <div className="flex items-center gap-2 mb-4">
-              <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center">
-                <span className="font-display font-bold text-primary-foreground text-xl">S</span>
-              </div>
-              <span className="font-display font-bold text-xl text-foreground">
-                Stark<span className="text-primary">labs</span>
-              </span>
+          <div className="flex items-center gap-2">
+            <div className="w-9 h-9 rounded-lg bg-primary flex items-center justify-center">
+              <span className="font-display font-bold text-primary-foreground text-lg">S</span>
             </div>
-            <p className="text-muted-foreground max-w-xs mb-6">
-              Pioneering breakthrough technologies for a better tomorrow.
-            </p>
-            <div className="flex gap-4">
-              {[Twitter, Linkedin, Github].map((Icon, index) => (
-                <a
-                  key={index}
-                  href="#"
-                  className="w-10 h-10 rounded-lg bg-secondary flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
-                >
-                  <Icon className="w-5 h-5" />
-                </a>
-              ))}
-            </div>
+            <span className="font-display font-bold text-lg text-foreground">
+              Stark<span className="text-primary">labs</span>
+            </span>
           </div>
 
           {/* Links */}
-          {Object.entries(links).map(([title, items]) => (
-            <div key={title}>
-              <h4 className="font-display font-semibold text-foreground mb-4">{title}</h4>
-              <ul className="space-y-3">
-                {items.map((item) => (
-                  <li key={item}>
-                    <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">
-                      {item}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+          <nav className="flex flex-wrap items-center justify-center gap-6">
+            <Link to="/" className="text-muted-foreground hover:text-foreground transition-colors">
+              Home
+            </Link>
+            <Link to="/products" className="text-muted-foreground hover:text-foreground transition-colors">
+              Platforms
+            </Link>
+            <a href="#contact" className="text-muted-foreground hover:text-foreground transition-colors">
+              Contact
+            </a>
+            <a 
+              href="https://github.com/StarkLabs-in" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1"
+            >
+              <Github className="w-4 h-4" />
+              GitHub
+            </a>
+          </nav>
         </div>
 
-        {/* Bottom Bar */}
-        <div className="mt-16 pt-8 border-t border-border flex flex-col md:flex-row justify-between items-center gap-4">
+        {/* Copyright */}
+        <div className="mt-8 pt-8 border-t border-border text-center">
           <p className="text-muted-foreground text-sm">
-            © 2024 Starklabs. All rights reserved.
-          </p>
-          <p className="text-muted-foreground text-sm">
-            Advancing humanity through science and innovation.
+            © {new Date().getFullYear()} Starklabs. All rights reserved.
           </p>
         </div>
       </div>
