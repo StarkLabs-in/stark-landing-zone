@@ -1,8 +1,10 @@
-import { motion } from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import MagneticElement from "./MagneticElement";
+import Scene3D from "./Scene3D";
+import { useRef } from "react";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -16,13 +18,15 @@ const containerVariants = {
 };
 
 const itemVariants = {
-  hidden: { opacity: 0, y: 30 },
+  hidden: { opacity: 0, y: 50, rotateX: 45, scale: 0.9 },
   visible: {
     opacity: 1,
     y: 0,
+    rotateX: 0,
+    scale: 1,
     transition: {
-      duration: 0.6,
-      ease: "easeOut" as const,
+      duration: 0.8,
+      ease: [0.215, 0.61, 0.355, 1.0], // cubic-out
     },
   },
 };
@@ -40,16 +44,38 @@ const backgroundVariants = {
 };
 
 const Hero = () => {
+  const containerRef = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start start", "end start"],
+  });
+
+  const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
+  const scale = useTransform(scrollYProgress, [0, 0.5], [1, 0.9]);
+  const y = useTransform(scrollYProgress, [0, 0.5], [0, 100]);
+
   return (
     <motion.section
+      ref={containerRef}
       initial="hidden"
       animate="visible"
       className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20"
+      style={{ opacity }}
     >
+      <div className="absolute inset-0 perspective-1000">
+        <motion.div
+          style={{ scale, y }}
+          className="w-full h-full relative"
+        >
+          {/* 3D Background Scene */}
+          <Scene3D scrollProgress={scrollYProgress} />
+        </motion.div>
+      </div>
+
       {/* Background Grid Pattern - responds to cursor */}
       <motion.div
         variants={backgroundVariants}
-        className="absolute inset-0 grid-pattern opacity-30"
+        className="absolute inset-0 grid-pattern opacity-20"
         style={{
           transform: "translate3d(var(--parallax-x, 0), var(--parallax-y, 0), 0)",
           willChange: "transform",
