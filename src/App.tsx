@@ -10,6 +10,7 @@ import CompetitiveHabitTracker from "./pages/products/CompetitiveHabitTracker";
 import NeuralTarot from "./pages/products/NeuralTarot";
 import NotFound from "./pages/NotFound";
 import CustomCursor from "./components/CustomCursor";
+import PageLoader from "./components/PageLoader";
 
 const queryClient = new QueryClient();
 
@@ -17,6 +18,7 @@ const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
+        <PageLoader />
         <Toaster />
         <Sonner />
         <CustomCursor />

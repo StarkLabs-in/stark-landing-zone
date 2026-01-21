@@ -1,5 +1,6 @@
 import { Github } from "lucide-react";
 import { Link } from "react-router-dom";
+import RevealText from "./RevealText";
 
 const Footer = () => {
   return (
@@ -11,9 +12,10 @@ const Footer = () => {
             <div className="w-9 h-9 rounded-lg bg-primary flex items-center justify-center">
               <span className="font-display font-bold text-primary-foreground text-lg">S</span>
             </div>
-            <span className="font-display font-bold text-lg text-foreground">
-              Stark<span className="text-primary">labs</span>
-            </span>
+            <RevealText
+              text="Starklabs"
+              className="font-display font-bold text-lg text-foreground"
+            />
           </div>
 
           {/* Links */}

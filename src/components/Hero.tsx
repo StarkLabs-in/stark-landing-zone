@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import MagneticElement from "./MagneticElement";
 import Scene3D from "./Scene3D";
+import RevealText from "./RevealText";
 import { useRef } from "react";
 
 const containerVariants = {
@@ -120,13 +121,10 @@ const Hero = () => {
           </motion.div>
 
           {/* Main Headline */}
-          <motion.h1
-            variants={itemVariants}
-            className="font-display text-4xl md:text-6xl lg:text-7xl font-bold leading-tight mb-6"
-          >
-            Engineering Intelligence{" "}
-            <span className="gradient-text">for the Real World</span>
-          </motion.h1>
+          <RevealText
+            text="Engineering Intelligence for the Real World"
+            className="font-display text-4xl md:text-6xl lg:text-7xl font-bold leading-tight mb-6 justify-center"
+          />
 
           {/* Subtitle */}
           <motion.p

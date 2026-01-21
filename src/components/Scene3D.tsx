@@ -1,18 +1,22 @@
 import { useRef, useMemo } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { Points, PointMaterial, Float, Sphere, MeshDistortMaterial } from "@react-three/drei";
+import { Points, PointMaterial, Float, Line, Sphere, MeshDistortMaterial, PerspectiveCamera } from "@react-three/drei";
 import * as THREE from "three";
 
-function ParticleField({ count = 2000, scrollProgress }: { count?: number; scrollProgress: any }) {
+function NeuralGrid({ count = 1000, scrollProgress }: { count?: number; scrollProgress: any }) {
+  // Reduce count on mobile/low-perf devices
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+  const finalCount = isMobile ? Math.floor(count / 3) : count;
+
   const points = useMemo(() => {
-    const p = new Float32Array(count * 3);
-    for (let i = 0; i < count; i++) {
-      p[i * 3] = (Math.random() - 0.5) * 15;
-      p[i * 3 + 1] = (Math.random() - 0.5) * 15;
-      p[i * 3 + 2] = (Math.random() - 0.5) * 15;
+    const p = new Float32Array(finalCount * 3);
+    for (let i = 0; i < finalCount; i++) {
+      p[i * 3] = (Math.random() - 0.5) * 20;
+      p[i * 3 + 1] = (Math.random() - 0.5) * 20;
+      p[i * 3 + 2] = (Math.random() - 0.5) * 20;
     }
     return p;
-  }, [count]);
+  }, [finalCount]);
 
   const ref = useRef<THREE.Points>(null!);
 
@@ -20,10 +24,9 @@ function ParticleField({ count = 2000, scrollProgress }: { count?: number; scrol
     const time = state.clock.getElapsedTime();
     const scroll = scrollProgress?.get() || 0;
 
-    ref.current.rotation.x = time * 0.02 + scroll * 0.5;
-    ref.current.rotation.y = time * 0.03 + scroll * 0.8;
+    ref.current.rotation.y = time * 0.05 + scroll * 0.5;
+    ref.current.rotation.z = time * 0.02;
 
-    // Mouse interaction
     const mouseX = state.mouse.x * 0.5;
     const mouseY = state.mouse.y * 0.5;
     ref.current.position.x = THREE.MathUtils.lerp(ref.current.position.x, mouseX, 0.05);
@@ -35,57 +38,93 @@ function ParticleField({ count = 2000, scrollProgress }: { count?: number; scrol
       <PointMaterial
         transparent
         color="#3b82f6"
-        size={0.02}
+        size={0.05}
         sizeAttenuation={true}
         depthWrite={false}
         blending={THREE.AdditiveBlending}
-        opacity={0.4}
+        opacity={0.6}
       />
     </Points>
   );
 }
 
-function FloatingShape({ scrollProgress }: { scrollProgress: any }) {
-  const ref = useRef<THREE.Mesh>(null!);
+function TechCore({ scrollProgress }: { scrollProgress: any }) {
+  const meshRef = useRef<THREE.Mesh>(null!);
+  const groupRef = useRef<THREE.Group>(null!);
 
   useFrame((state) => {
     const time = state.clock.getElapsedTime();
     const scroll = scrollProgress?.get() || 0;
-    ref.current.rotation.x = time * 0.2 + scroll * 2;
-    ref.current.rotation.y = time * 0.3 + scroll * 1.5;
-    ref.current.position.y = Math.sin(time * 0.5) * 0.5 - scroll * 2;
+
+    groupRef.current.rotation.y = time * 0.2 + scroll * 1.5;
+    groupRef.current.rotation.x = Math.sin(time * 0.3) * 0.2;
+    groupRef.current.position.y = Math.sin(time * 0.5) * 0.2 - scroll * 1;
+
+    if (meshRef.current) {
+      meshRef.current.rotation.z = time * 0.5;
+    }
   });
 
   return (
-    <Sphere ref={ref} args={[1, 64, 64]} position={[3, 1, -2]}>
-      <MeshDistortMaterial
-        color="#6366f1"
-        speed={2}
-        distort={0.4}
-        radius={1}
-        emissive="#4338ca"
-        emissiveIntensity={0.5}
-      />
-    </Sphere>
+    <group ref={groupRef}>
+      {/* Outer Wireframe Sphere */}
+      <mesh ref={meshRef}>
+        <sphereGeometry args={[2, 32, 32]} />
+        <meshStandardMaterial
+          color="#3b82f6"
+          wireframe
+          transparent
+          opacity={0.3}
+          emissive="#3b82f6"
+          emissiveIntensity={0.5}
+        />
+      </mesh>
+
+      {/* Inner Distorted Core */}
+      <Sphere args={[1.2, 64, 64]}>
+        <MeshDistortMaterial
+          color="#6366f1"
+          speed={3}
+          distort={0.4}
+          radius={1.2}
+          emissive="#4338ca"
+          emissiveIntensity={1}
+        />
+      </Sphere>
+
+      {/* Glowing Rings */}
+      {[0, 1, 2].map((i) => (
+        <mesh key={i} rotation={[Math.PI / (i + 1.5), i, 0]}>
+          <torusGeometry args={[2.5 + i * 0.2, 0.02, 16, 100]} />
+          <meshStandardMaterial
+            color="#3b82f6"
+            emissive="#3b82f6"
+            emissiveIntensity={2}
+          />
+        </mesh>
+      ))}
+    </group>
   );
 }
 
 const Scene3D = ({ scrollProgress }: { scrollProgress: any }) => {
   return (
     <div className="absolute inset-0 z-0 pointer-events-none">
-      <Canvas camera={{ position: [0, 0, 8], fov: 60 }}>
-        <ambientLight intensity={0.5} />
-        <pointLight position={[10, 10, 10]} intensity={1} />
-        <pointLight position={[-10, -10, -10]} color="#3b82f6" intensity={0.5} />
-        <Float speed={1.5} rotationIntensity={1} floatIntensity={1}>
-          <ParticleField scrollProgress={scrollProgress} />
+      <Canvas
+        dpr={[1, 2]}
+        gl={{ antialias: false, powerPreference: "high-performance" }}
+      >
+        <PerspectiveCamera makeDefault position={[0, 0, 10]} fov={50} />
+        <ambientLight intensity={0.4} />
+        <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} intensity={1} />
+        <pointLight position={[-10, -10, -10]} color="#3b82f6" intensity={1} />
+
+        <Float speed={2} rotationIntensity={0.5} floatIntensity={0.5}>
+          <NeuralGrid scrollProgress={scrollProgress} />
+          <TechCore scrollProgress={scrollProgress} />
         </Float>
-        <FloatingShape scrollProgress={scrollProgress} />
-        <Float speed={2} rotationIntensity={2} floatIntensity={2}>
-          <Sphere args={[0.5, 32, 32]} position={[-4, -2, -1]}>
-            <MeshDistortMaterial color="#3b82f6" speed={3} distort={0.6} />
-          </Sphere>
-        </Float>
+
+        <fog attach="fog" args={["#000", 5, 20]} />
       </Canvas>
     </div>
   );

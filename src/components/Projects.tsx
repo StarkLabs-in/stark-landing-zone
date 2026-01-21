@@ -3,6 +3,9 @@ import { ArrowRight, FileText, Target, Stars, Rocket } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import MagneticElement from "./MagneticElement";
+import RevealText from "./RevealText";
+import InteractiveCard from "./InteractiveCard";
+import AnimatedIcon from "./AnimatedIcon";
 
 const projects = [
   {
@@ -39,20 +42,21 @@ const Projects = () => {
       
       <div className="container mx-auto px-6">
         {/* Section Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-16"
-        >
-          <h2 className="font-display text-3xl md:text-5xl font-bold mb-4">
-            Our <span className="gradient-text">Products</span>
-          </h2>
-          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+        <div className="text-center mb-16">
+          <RevealText
+            text="Our Products"
+            className="font-display text-3xl md:text-5xl font-bold mb-4 justify-center"
+          />
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            className="text-muted-foreground text-lg max-w-2xl mx-auto"
+          >
             Production-grade AI products designed to solve real problems at scale.
-          </p>
-        </motion.div>
+          </motion.p>
+        </div>
 
         {/* Projects Grid */}
         <div className="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto">
@@ -65,10 +69,10 @@ const Projects = () => {
               transition={{ duration: 0.5, delay: index * 0.1 }}
               className="group"
             >
-              <MagneticElement intensity={0.15} className="h-full">
-                <div className="h-full p-8 rounded-2xl bg-card border border-border hover:border-primary/50 transition-all duration-300 card-glow flex flex-col">
+              <InteractiveCard className="h-full">
+                <div className="h-full p-8 rounded-2xl bg-card border border-border group-hover:border-primary/50 transition-all duration-300 card-glow flex flex-col">
                   <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center mb-6 group-hover:bg-primary/20 transition-colors">
-                    <project.icon className="w-7 h-7 text-primary" />
+                    <AnimatedIcon icon={project.icon} className="w-7 h-7 text-primary" delay={index * 0.1} />
                   </div>
                   <h3 className="font-display text-2xl font-semibold mb-3 text-foreground">
                     {project.title}
@@ -85,7 +89,7 @@ const Projects = () => {
                     </Link>
                   </MagneticElement>
                 </div>
-              </MagneticElement>
+              </InteractiveCard>
             </motion.div>
           ))}
         </div>
