@@ -1,5 +1,8 @@
 import { motion } from "framer-motion";
 import { Cpu, Sparkles, Cog, FlaskConical } from "lucide-react";
+import RevealText from "./RevealText";
+import InteractiveCard from "./InteractiveCard";
+import AnimatedIcon from "./AnimatedIcon";
 
 const services = [
   {
@@ -29,20 +32,21 @@ const WhatWeDo = () => {
     <section id="about" className="py-24 relative">
       <div className="container mx-auto px-6">
         {/* Section Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-16"
-        >
-          <h2 className="font-display text-3xl md:text-5xl font-bold mb-4">
-            What We <span className="gradient-text">Build</span>
-          </h2>
-          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+        <div className="text-center mb-16">
+          <RevealText
+            text="What We Build"
+            className="font-display text-3xl md:text-5xl font-bold mb-4 justify-center"
+          />
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            className="text-muted-foreground text-lg max-w-2xl mx-auto"
+          >
             Starklabs is an AI engineering company focused on building production-grade systems for real-world use cases.
-          </p>
-        </motion.div>
+          </motion.p>
+        </div>
 
         {/* Services Grid */}
         <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
@@ -55,17 +59,19 @@ const WhatWeDo = () => {
               transition={{ duration: 0.5, delay: index * 0.1 }}
               className="group"
             >
-              <div className="h-full p-8 rounded-2xl bg-card border border-border hover:border-primary/50 transition-all duration-300 card-glow">
-                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-5 group-hover:bg-primary/20 transition-colors">
-                  <service.icon className="w-6 h-6 text-primary" />
+              <InteractiveCard>
+                <div className="h-full p-8 rounded-2xl bg-card border border-border group-hover:border-primary/50 transition-all duration-300 card-glow">
+                  <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-5 group-hover:bg-primary/20 transition-colors">
+                    <AnimatedIcon icon={service.icon} className="w-6 h-6 text-primary" delay={index * 0.1} />
+                  </div>
+                  <h3 className="font-display text-xl font-semibold mb-3 text-foreground">
+                    {service.title}
+                  </h3>
+                  <p className="text-muted-foreground leading-relaxed">
+                    {service.description}
+                  </p>
                 </div>
-                <h3 className="font-display text-xl font-semibold mb-3 text-foreground">
-                  {service.title}
-                </h3>
-                <p className="text-muted-foreground leading-relaxed">
-                  {service.description}
-                </p>
-              </div>
+              </InteractiveCard>
             </motion.div>
           ))}
         </div>

@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import RevealText from "./RevealText";
 
 const technologies = [
   "Python",
@@ -16,20 +17,21 @@ const TechStack = () => {
     <section className="py-20 relative">
       <div className="container mx-auto px-6">
         {/* Section Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-12"
-        >
-          <h2 className="font-display text-2xl md:text-3xl font-bold mb-3">
-            Technology <span className="gradient-text">Stack</span>
-          </h2>
-          <p className="text-muted-foreground max-w-xl mx-auto">
+        <div className="text-center mb-12">
+          <RevealText
+            text="Technology Stack"
+            className="font-display text-2xl md:text-3xl font-bold mb-3 justify-center"
+          />
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            className="text-muted-foreground max-w-xl mx-auto"
+          >
             Built on industry-leading tools and frameworks
-          </p>
-        </motion.div>
+          </motion.p>
+        </div>
 
         {/* Tech Pills */}
         <motion.div

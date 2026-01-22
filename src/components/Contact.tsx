@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { Mail, MapPin, Github } from "lucide-react";
+import RevealText from "./RevealText";
 
 const Contact = () => {
   return (
@@ -8,19 +9,20 @@ const Contact = () => {
       <div className="absolute inset-0 bg-gradient-to-b from-background via-secondary/30 to-background" />
 
       <div className="container mx-auto px-6 relative z-10">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="max-w-4xl mx-auto text-center"
-        >
-          <h2 className="font-display text-3xl md:text-5xl font-bold mb-4">
-            Get in <span className="gradient-text">Touch</span>
-          </h2>
-          <p className="text-muted-foreground text-lg mb-12 max-w-2xl mx-auto">
+        <div className="max-w-4xl mx-auto text-center">
+          <RevealText
+            text="Get in Touch"
+            className="font-display text-3xl md:text-5xl font-bold mb-4 justify-center"
+          />
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            className="text-muted-foreground text-lg mb-12 max-w-2xl mx-auto"
+          >
             Ready to build production-grade AI systems? Let's discuss how Starklabs can help.
-          </p>
+          </motion.p>
 
           {/* Contact Box */}
           <motion.div
@@ -64,7 +66,7 @@ const Contact = () => {
               </div>
             </div>
           </motion.div>
-        </motion.div>
+        </div>
       </div>
     </section>
   );

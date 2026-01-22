@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { Wrench, BookOpen, Shield, Users } from "lucide-react";
+import RevealText from "./RevealText";
 
 const reasons = [
   {
@@ -32,20 +33,21 @@ const WhyStarklabs = () => {
 
       <div className="container mx-auto px-6 relative z-10">
         {/* Section Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-16"
-        >
-          <h2 className="font-display text-3xl md:text-5xl font-bold mb-4">
-            Why <span className="gradient-text">Starklabs</span>
-          </h2>
-          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+        <div className="text-center mb-16">
+          <RevealText
+            text="Why Starklabs"
+            className="font-display text-3xl md:text-5xl font-bold mb-4 justify-center"
+          />
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            className="text-muted-foreground text-lg max-w-2xl mx-auto"
+          >
             We don't just build AI—we engineer intelligent systems that work in the real world.
-          </p>
-        </motion.div>
+          </motion.p>
+        </div>
 
         {/* Reasons Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
