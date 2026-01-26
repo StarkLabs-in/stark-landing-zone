@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import MagneticElement from "./MagneticElement";
 import Scene3D from "./Scene3D";
 import TypewriterText from "./TypewriterText";
+import Starfield from "./Starfield";
 import { useRef } from "react";
 
 const containerVariants = {
@@ -68,6 +69,8 @@ const Hero = () => {
           style={{ scale, y }}
           className="w-full h-full relative"
         >
+          {/* Starfield Background */}
+          <Starfield />
           {/* 3D Background Scene */}
           <Scene3D scrollProgress={scrollYProgress} />
         </motion.div>
