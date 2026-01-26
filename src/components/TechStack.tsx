@@ -1,5 +1,30 @@
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import RevealText from "./RevealText";
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.06,
+      delayChildren: 0.3,
+    },
+  },
+};
+
+const pillVariants = {
+  hidden: { opacity: 0, scale: 0.8, y: 20 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    y: 0,
+    transition: {
+      type: "spring" as const,
+      damping: 15,
+      stiffness: 150,
+    },
+  },
+};
 
 const technologies = [
   "Python",
@@ -35,20 +60,18 @@ const TechStack = () => {
 
         {/* Tech Pills */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.2 }}
           className="flex flex-wrap justify-center gap-3 max-w-4xl mx-auto"
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-50px" }}
         >
-          {technologies.map((tech, index) => (
+          {technologies.map((tech) => (
             <motion.div
               key={tech}
-              initial={{ opacity: 0, scale: 0.9 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.3, delay: index * 0.05 }}
-              className="px-5 py-2.5 rounded-full bg-secondary border border-border text-foreground font-medium text-sm hover:border-primary/50 hover:bg-primary/10 transition-all cursor-default"
+              variants={pillVariants}
+              whileHover={{ scale: 1.05, y: -2 }}
+              className="px-5 py-2.5 rounded-full bg-secondary border border-border text-foreground font-medium text-sm hover:border-primary/50 hover:bg-primary/10 transition-colors cursor-default"
             >
               {tech}
             </motion.div>

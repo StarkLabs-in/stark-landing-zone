@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import MagneticElement from "./MagneticElement";
 import Scene3D from "./Scene3D";
-import RevealText from "./RevealText";
+import TypewriterText from "./TypewriterText";
 import { useRef } from "react";
 
 const containerVariants = {
@@ -27,7 +27,7 @@ const itemVariants = {
     scale: 1,
     transition: {
       duration: 0.8,
-      ease: [0.215, 0.61, 0.355, 1.0], // cubic-out
+      ease: [0.215, 0.61, 0.355, 1.0] as const,
     },
   },
 };
@@ -120,10 +120,12 @@ const Hero = () => {
             <span className="text-sm text-muted-foreground">AI Engineering & Technology Company</span>
           </motion.div>
 
-          {/* Main Headline */}
-          <RevealText
+          {/* Main Headline with Typewriter */}
+          <TypewriterText
             text="Engineering Intelligence for the Real World"
-            className="font-display text-4xl md:text-6xl lg:text-7xl font-bold leading-tight mb-6 justify-center"
+            className="font-display text-4xl md:text-6xl lg:text-7xl font-bold leading-tight mb-6"
+            delay={0.5}
+            speed={40}
           />
 
           {/* Subtitle */}
