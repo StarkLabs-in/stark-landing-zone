@@ -154,7 +154,7 @@ const Hero = () => {
             </MagneticElement>
             <MagneticElement intensity={0.25}>
               <a href="#contact">
-                <Button variant="outline" size="lg" className="text-lg px-8 py-6 border-border hover:bg-secondary">
+                <Button variant="outline" size="lg" className="text-lg px-8 py-6 border-border hover:bg-secondary btn-outline-glow">
                   Contact Starklabs
                 </Button>
               </a>
