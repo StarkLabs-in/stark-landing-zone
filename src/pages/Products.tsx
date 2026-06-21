@@ -23,9 +23,9 @@ const products = [
   {
     icon: Cpu,
     title: "Future AI Club",
-    description: "An AI & technology learning community where curious minds explore AI, coding, and digital creativity through hands-on workshops. Beginner-friendly and open to all ages.",
-    link: "/products/future-ai-club",
-    status: "Founding Cohort",
+    description: "Exploring whether there's interest in a community to learn AI, coding, and digital creativity together. Beginner-friendly, open to all ages — join the interest list.",
+    link: "/future-ai-club",
+    status: "Interest List Open",
   },
   {
     icon: Rocket,
