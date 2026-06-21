@@ -16,6 +16,15 @@ import AdminDashboard from "./pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
 import CustomCursor from "./components/CustomCursor";
 import PageLoader from "./components/PageLoader";
+import ScrollProgress from "./components/ScrollProgress";
+
+const ScrollToTop = () => {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+  return null;
+};
 
 const queryClient = new QueryClient();
 
