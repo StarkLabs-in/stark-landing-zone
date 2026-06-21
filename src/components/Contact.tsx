@@ -26,7 +26,10 @@ const Contact = () => {
 
           {/* Contact Box */}
           <motion.div
-            variants={scaleIn}
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.5 }}
             className="bg-card border border-border rounded-3xl p-10"
           >
             <div className="grid sm:grid-cols-3 gap-8">
