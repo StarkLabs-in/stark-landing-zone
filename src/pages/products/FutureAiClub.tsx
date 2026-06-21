@@ -10,9 +10,10 @@ import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
-import { supabase } from "@/lib/supabase";
+import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { sendWelcomeEmail, postWhatsAppWebhook } from "@/lib/emailService";
 import { toast } from "sonner";
+import DemoModeBanner from "@/components/DemoModeBanner";
 
 /* ------------------------------------------------------------------ */
 /*  Imagery                                                            */
@@ -310,8 +311,17 @@ export default function FutureAiClubProduct() {
 
     setIsSubmitting(true);
     try {
+      // Generate ids client-side so we don't need to read rows back from
+      // tables the anon role isn't granted SELECT on (parents/students are
+      // insert-only for public). This also avoids a race condition where a
+      // concurrent signup with the same name/email could be matched instead
+      // of the one we just created.
+      const parentId = crypto.randomUUID();
+      const studentId = crypto.randomUUID();
+
       // 1. Member contact
       const { error: parentError } = await supabase.from("parents").insert({
+        id: parentId,
         parent_name: fullName.trim(),
         mobile_number: phone.trim(),
         whatsapp_number: whatsapp.trim(),
@@ -319,13 +329,10 @@ export default function FutureAiClubProduct() {
         occupation: occupation.trim(),
       });
       if (parentError) throw parentError;
-      const parentsList = await supabase.from("parents").select("*");
-      const savedParent =
-        parentsList.data?.find((p: any) => p.email_address === email.trim()) ||
-        { id: crypto.randomUUID() };
 
       // 2. Member profile
       const { error: studentError } = await supabase.from("students").insert({
+        id: studentId,
         student_name: fullName.trim(),
         age: parseInt(age, 10),
         date_of_birth: null,
@@ -333,32 +340,27 @@ export default function FutureAiClubProduct() {
         grade_class: "N/A",
       });
       if (studentError) throw studentError;
-      const studentsList = await supabase.from("students").select("*");
-      const savedStudent =
-        studentsList.data?.find((s: any) => s.student_name === fullName.trim()) ||
-        { id: crypto.randomUUID() };
 
       // 3. Membership / workshop interest
-      const { error: regError } = await supabase.from("registrations").insert({
-        student_id: savedStudent.id,
-        parent_id: savedParent.id,
-        interests: [`Experience: ${experience}`, ...interests],
-        laptop_available: laptopAvailable === true,
-        operating_system: "N/A",
-        internet_available: true,
-        program: PROGRAM,
-        preferred_batch: timing,
-        consent_project_based: consent,
-        consent_communication: consent,
-        consent_terms_privacy: consent,
-        status: "interested",
-      });
+      const { data: savedReg, error: regError } = await supabase
+        .from("registrations")
+        .insert({
+          student_id: studentId,
+          parent_id: parentId,
+          interests: [`Experience: ${experience}`, ...interests],
+          laptop_available: laptopAvailable === true,
+          operating_system: "N/A",
+          internet_available: true,
+          program: PROGRAM,
+          preferred_batch: timing,
+          consent_project_based: consent,
+          consent_communication: consent,
+          consent_terms_privacy: consent,
+          status: "interested",
+        })
+        .select()
+        .single();
       if (regError) throw regError;
-
-      const regList = await supabase.from("registrations").select("*");
-      const savedReg =
-        regList.data?.find((r: any) => r.student_id === savedStudent.id) ||
-        { registration_id: `STARK-2026-${Math.floor(1000 + Math.random() * 9000)}` };
 
       // 4. Notifications
       await sendWelcomeEmail(email.trim(), fullName.trim(), savedReg.registration_id);
@@ -387,6 +389,7 @@ export default function FutureAiClubProduct() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Navbar />
+      {!isSupabaseConfigured && <DemoModeBanner />}
 
       <main className="pt-28 pb-24">
         <div className="container mx-auto px-6">

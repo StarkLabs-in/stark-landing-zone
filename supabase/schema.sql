@@ -75,16 +75,6 @@ DECLARE
     current_year_str TEXT;
     next_seq INT;
     new_reg_id TEXT;
-END;
-$$ LANGUAGE plpgsql;
-
--- Set up the trigger function
-CREATE OR REPLACE FUNCTION generate_stark_reg_id()
-RETURNS TRIGGER AS $$
-DECLARE
-    current_year_str TEXT;
-    next_seq INT;
-    new_reg_id TEXT;
 BEGIN
     current_year_str := to_char(CURRENT_DATE, 'YYYY');
     
@@ -106,3 +96,53 @@ BEFORE INSERT ON registrations
 FOR EACH ROW
 WHEN (NEW.registration_id IS NULL)
 EXECUTE FUNCTION generate_stark_reg_id();
+
+-- Enable Row Level Security (RLS) on all tables
+ALTER TABLE parents ENABLE ROW LEVEL SECURITY;
+ALTER TABLE students ENABLE ROW LEVEL SECURITY;
+ALTER TABLE registrations ENABLE ROW LEVEL SECURITY;
+ALTER TABLE leads ENABLE ROW LEVEL SECURITY;
+
+-- -----------------------------------------------------
+-- RLS POLICIES
+-- -----------------------------------------------------
+
+-- Policies for parents table
+CREATE POLICY "Allow public insert on parents" ON parents
+    FOR INSERT TO public
+    WITH CHECK (true);
+
+CREATE POLICY "Allow authenticated full access on parents" ON parents
+    FOR ALL TO authenticated
+    USING (true);
+
+-- Policies for students table
+CREATE POLICY "Allow public insert on students" ON students
+    FOR INSERT TO public
+    WITH CHECK (true);
+
+CREATE POLICY "Allow authenticated full access on students" ON students
+    FOR ALL TO authenticated
+    USING (true);
+
+-- Policies for registrations table
+CREATE POLICY "Allow public insert on registrations" ON registrations
+    FOR INSERT TO public
+    WITH CHECK (true);
+
+CREATE POLICY "Allow public select on registrations" ON registrations
+    FOR SELECT TO public
+    USING (true);
+
+CREATE POLICY "Allow authenticated full access on registrations" ON registrations
+    FOR ALL TO authenticated
+    USING (true);
+
+-- Policies for leads table
+CREATE POLICY "Allow public insert on leads" ON leads
+    FOR INSERT TO public
+    WITH CHECK (true);
+
+CREATE POLICY "Allow authenticated full access on leads" ON leads
+    FOR ALL TO authenticated
+    USING (true);

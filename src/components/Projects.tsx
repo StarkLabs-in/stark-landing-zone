@@ -1,5 +1,5 @@
 import { motion, useReducedMotion } from "framer-motion";
-import { ArrowRight, FileText, Target, Stars, Rocket } from "lucide-react";
+import { ArrowRight, FileText, Target, Stars, Rocket, Cpu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import MagneticElement from "./MagneticElement";
@@ -48,8 +48,8 @@ const projects = [
   {
     icon: Cpu,
     title: "Future AI Club",
-    description: "An AI & technology learning community exploring AI, coding, and digital creativity through hands-on workshops. Beginner-friendly and open to all ages.",
-    link: "/products/future-ai-club",
+    description: "Exploring whether there's interest in a community to learn AI, coding, and digital creativity together. Beginner-friendly, open to all ages — join the interest list.",
+    link: "/future-ai-club",
   },
   {
     icon: Rocket,
