@@ -39,7 +39,6 @@ export default function FutureAiClub() {
   // ──────────────────────────────────────────────────────
   // NEW INTEREST VALIDATION STATES
   // ──────────────────────────────────────────────────────
-  const [isIntro, setIsIntro] = useState(true);
   const [isInterestModalOpen, setIsInterestModalOpen] = useState(false);
   const [isInterestSubmitting, setIsInterestSubmitting] = useState(false);
   const [interestSubmitted, setInterestSubmitted] = useState(false);
@@ -111,12 +110,6 @@ export default function FutureAiClub() {
     if (el) el.scrollIntoView({ behavior: "smooth" });
   };
 
-  // Auto-dismiss intro after 2 seconds
-  useEffect(() => {
-    const timer = setTimeout(() => setIsIntro(false), 2000);
-    return () => clearTimeout(timer);
-  }, []);
-
   // ──────────────────────────────────────────────────────
   // RENDER
   // ──────────────────────────────────────────────────────
@@ -126,61 +119,7 @@ export default function FutureAiClub() {
       {!isSupabaseConfigured && <DemoModeBanner />}
 
       {/* 3D Immersive background scene */}
-      <FutureAiClubScene isIntro={isIntro} />
-
-      {/* ══════════════════════════════════════════════════ */}
-      {/* ENTRY INTRO OVERLAY                                */}
-      {/* ══════════════════════════════════════════════════ */}
-      <AnimatePresence>
-        {isIntro && (
-          <motion.div
-            initial={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.5 }}
-            className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-slate-950/95 backdrop-blur-md text-center p-6"
-          >
-            <div className="max-w-md mx-auto space-y-6">
-              <motion.h1
-                initial={{ opacity: 0, y: -25 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.1 }}
-                className="text-4xl md:text-5xl font-bold tracking-tight font-display text-white"
-              >
-                FUTURE AI CLUB
-              </motion.h1>
-              <motion.p
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.3 }}
-                className="text-cyan-400 font-semibold tracking-wider uppercase text-sm font-display"
-              >
-                Future Inventions Start Here
-              </motion.p>
-
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.4, delay: 0.5 }}
-                className="flex gap-4 justify-center pt-8"
-              >
-                <Button
-                  onClick={() => setIsIntro(false)}
-                  className="bg-cyan-500 hover:bg-cyan-600 text-slate-950 font-bold px-6 py-2.5 rounded-lg transition-all"
-                >
-                  Continue
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => setIsIntro(false)}
-                  className="border-slate-700 text-slate-300 hover:text-white hover:border-slate-500"
-                >
-                  Skip Animation
-                </Button>
-              </motion.div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <FutureAiClubScene isIntro={false} />
 
       {/* ══════════════════════════════════════════════════ */}
       {/* HERO SECTION                                       */}
