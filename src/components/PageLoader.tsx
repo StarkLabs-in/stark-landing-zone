@@ -56,37 +56,37 @@ const WireCore = ({
       <mesh>
         <icosahedronGeometry args={[1.6, detail]} />
         <meshBasicMaterial
-          color="#ffffff"
+          color="#0EA5E9"
           wireframe
           transparent
-          opacity={0.18 + intensity * 0.22}
+          opacity={0.35 + intensity * 0.35}
         />
       </mesh>
 
       <mesh ref={innerRef}>
         <icosahedronGeometry args={[0.7, 0]} />
         <meshBasicMaterial
-          color="#ffffff"
+          color="#67E8F9"
           wireframe
           transparent
-          opacity={0.55 + intensity * 0.4}
+          opacity={0.6 + intensity * 0.4}
         />
       </mesh>
 
       <mesh>
         <sphereGeometry args={[0.22, isMobile ? 10 : 16, isMobile ? 10 : 16]} />
-        <meshBasicMaterial color="#ffffff" transparent opacity={intensity} />
+        <meshBasicMaterial color="#A5F3FC" transparent opacity={intensity} />
       </mesh>
 
       <mesh ref={ringRef} rotation={[Math.PI / 2, 0, 0]}>
         <torusGeometry args={[2.1, 0.005, 6, isMobile ? 48 : 96]} />
-        <meshBasicMaterial color="#ffffff" transparent opacity={0.5} />
+        <meshBasicMaterial color="#0EA5E9" transparent opacity={0.6} />
       </mesh>
 
       {!isMobile && (
         <mesh ref={ring2Ref}>
           <torusGeometry args={[2.4, 0.003, 6, 96]} />
-          <meshBasicMaterial color="#ffffff" transparent opacity={0.3} />
+          <meshBasicMaterial color="#0EA5E9" transparent opacity={0.4} />
         </mesh>
       )}
     </group>
@@ -139,11 +139,11 @@ const ParticleField = ({
         />
       </bufferGeometry>
       <pointsMaterial
-        color="#ffffff"
-        size={0.022}
+        color="#38BDF8"
+        size={0.024}
         sizeAttenuation
         transparent
-        opacity={0.7}
+        opacity={0.8}
       />
     </points>
   );
@@ -162,14 +162,15 @@ const CameraDolly = ({ exiting }: { exiting: boolean }) => {
 /* --------------------------------- Loader -------------------------------- */
 
 const bootLines = [
-  "Initializing kernel",
-  "Mounting neural cortex",
-  "Calibrating shaders",
-  "Linking AI subsystems",
-  "Establishing secure channel",
-  "Compiling render pipeline",
-  "Synchronizing nodes",
-  "Bootstrapping interface",
+  "Booting Starklabs runtime",
+  "Loading AI engineering stack",
+  "Compiling product modules",
+  "Linking Future AI Club",
+  "Initializing StarkLedger node",
+  "Calibrating Neural Tarot model",
+  "Syncing Habit Tracker telemetry",
+  "Establishing secure enterprise channel",
+  "Rendering interface",
 ];
 
 const PageLoader = () => {
@@ -312,7 +313,7 @@ const PageLoader = () => {
               className="mt-64 flex flex-col items-center gap-3"
             >
               <span className="text-[10px] font-mono text-primary uppercase tracking-[0.4em]">
-                Rendering Reality
+                AI Engineering · Initializing
               </span>
               <span className="font-display text-2xl font-light tracking-widest text-foreground">
                 STARK<span className="text-primary">LABS</span>
@@ -353,7 +354,7 @@ const PageLoader = () => {
                 {bootLines[logIndex]}
               </motion.span>
               <div className="hidden sm:flex gap-4 text-muted-foreground/60">
-                <span>SYS_v4.0.2</span>
+                <span>STARKLABS//OS</span>
                 <span className="text-primary">● ONLINE</span>
               </div>
             </div>
