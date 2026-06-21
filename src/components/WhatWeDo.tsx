@@ -1,6 +1,33 @@
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { Cpu, Sparkles, Cog, FlaskConical } from "lucide-react";
-import { fadeUp, stagger, inViewProps } from "@/lib/motion";
+import RevealText from "./RevealText";
+import InteractiveCard from "./InteractiveCard";
+import AnimatedIcon from "./AnimatedIcon";
+
+const sectionVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+      delayChildren: 0.2,
+    },
+  },
+};
+
+const cardVariants = {
+  hidden: { opacity: 0, y: 40, scale: 0.95 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: {
+      type: "spring" as const,
+      damping: 20,
+      stiffness: 100,
+    },
+  },
+};
 
 const services = [
   {
@@ -30,46 +57,49 @@ const WhatWeDo = () => {
     <section id="about" className="py-24 relative">
       <div className="container mx-auto px-6">
         {/* Section Header */}
-        <motion.div {...inViewProps} variants={stagger(0.08)} className="text-center mb-16">
-          <motion.div
-            variants={fadeUp}
-            className="inline-block text-xs font-mono uppercase tracking-[0.25em] text-primary mb-4"
+        <div className="text-center mb-16">
+          <RevealText
+            text="What We Build"
+            className="font-display text-3xl md:text-5xl font-bold mb-4 justify-center"
+          />
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            className="text-muted-foreground text-lg max-w-2xl mx-auto"
           >
-            What We Do
-          </motion.div>
-          <motion.h2 variants={fadeUp} className="font-display text-3xl md:text-5xl font-bold mb-4">
-            What We <span className="gradient-text">Build</span>
-          </motion.h2>
-          <motion.p variants={fadeUp} className="text-muted-foreground text-lg max-w-2xl mx-auto">
             Starklabs is an AI engineering company focused on building production-grade systems for real-world use cases.
           </motion.p>
-        </motion.div>
+        </div>
 
         {/* Services Grid */}
-        <motion.div
-          {...inViewProps}
-          variants={stagger(0.12)}
+        <motion.div 
           className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto"
+          variants={sectionVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-100px" }}
         >
-          {services.map((service) => (
+          {services.map((service, index) => (
             <motion.div
               key={service.title}
-              variants={fadeUp}
-              whileHover={{ y: -6 }}
-              transition={{ type: "spring", stiffness: 300, damping: 20 }}
+              variants={cardVariants}
               className="group"
             >
-              <div className="h-full p-8 rounded-2xl bg-card border border-border hover:border-primary/50 card-glow">
-                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-5 group-hover:bg-primary/20 group-hover:scale-110 transition-all duration-300">
-                  <service.icon className="w-6 h-6 text-primary" />
+              <InteractiveCard>
+                <div className="h-full p-8 rounded-2xl bg-card border border-border group-hover:border-primary/50 transition-all duration-300 card-glow">
+                  <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-5 group-hover:bg-primary/20 transition-colors">
+                    <AnimatedIcon icon={service.icon} className="w-6 h-6 text-primary" delay={index * 0.1} />
+                  </div>
+                  <h3 className="font-display text-xl font-semibold mb-3 text-foreground">
+                    {service.title}
+                  </h3>
+                  <p className="text-muted-foreground leading-relaxed">
+                    {service.description}
+                  </p>
                 </div>
-                <h3 className="font-display text-xl font-semibold mb-3 text-foreground">
-                  {service.title}
-                </h3>
-                <p className="text-muted-foreground leading-relaxed">
-                  {service.description}
-                </p>
-              </div>
+              </InteractiveCard>
             </motion.div>
           ))}
         </motion.div>

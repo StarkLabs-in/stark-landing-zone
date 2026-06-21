@@ -18,7 +18,6 @@ const Navbar = () => {
 
   const navItems = [
     { label: "About", href: "/#about" },
-    { label: "Future AI Club", href: "/future-ai-club" },
     { label: "Products", href: "/products" },
     { label: "Contact", href: "/#contact" },
   ];

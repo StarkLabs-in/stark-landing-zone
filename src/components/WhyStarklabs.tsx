@@ -1,6 +1,31 @@
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { Wrench, BookOpen, Shield, Users } from "lucide-react";
-import { fadeUp, scaleIn, stagger, inViewProps } from "@/lib/motion";
+import RevealText from "./RevealText";
+
+const sectionVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.15,
+      delayChildren: 0.2,
+    },
+  },
+};
+
+const cardVariants = {
+  hidden: { opacity: 0, y: 30, scale: 0.9 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: {
+      type: "spring" as const,
+      damping: 20,
+      stiffness: 100,
+    },
+  },
+};
 
 const reasons = [
   {
@@ -33,35 +58,37 @@ const WhyStarklabs = () => {
 
       <div className="container mx-auto px-6 relative z-10">
         {/* Section Header */}
-        <motion.div {...inViewProps} variants={stagger(0.08)} className="text-center mb-16">
-          <motion.div
-            variants={fadeUp}
-            className="inline-block text-xs font-mono uppercase tracking-[0.25em] text-primary mb-4"
+        <div className="text-center mb-16">
+          <RevealText
+            text="Why Starklabs"
+            className="font-display text-3xl md:text-5xl font-bold mb-4 justify-center"
+          />
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            className="text-muted-foreground text-lg max-w-2xl mx-auto"
           >
-            Why Choose Us
-          </motion.div>
-          <motion.h2 variants={fadeUp} className="font-display text-3xl md:text-5xl font-bold mb-4">
-            Why <span className="gradient-text">Starklabs</span>
-          </motion.h2>
-          <motion.p variants={fadeUp} className="text-muted-foreground text-lg max-w-2xl mx-auto">
             We don't just build AI—we engineer intelligent systems that work in the real world.
           </motion.p>
-        </motion.div>
+        </div>
 
         {/* Reasons Grid */}
-        <motion.div
-          {...inViewProps}
-          variants={stagger(0.12)}
+        <motion.div 
           className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto"
+          variants={sectionVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-100px" }}
         >
           {reasons.map((reason) => (
-            <motion.div key={reason.title} variants={fadeUp} className="group text-center">
-              <motion.div
-                variants={scaleIn}
-                whileHover={{ rotate: 6, scale: 1.08 }}
-                transition={{ type: "spring", stiffness: 300, damping: 15 }}
-                className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-5 group-hover:bg-primary/20 transition-colors"
-              >
+            <motion.div
+              key={reason.title}
+              variants={cardVariants}
+              className="text-center"
+            >
+              <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-5">
                 <reason.icon className="w-8 h-8 text-primary" />
               </motion.div>
               <h3 className="font-display text-lg font-semibold mb-2 text-foreground">

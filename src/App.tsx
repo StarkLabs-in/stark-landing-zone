@@ -15,23 +15,15 @@ import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
 import CustomCursor from "./components/CustomCursor";
-import ScrollProgress from "./components/ScrollProgress";
+import PageLoader from "./components/PageLoader";
 
 const queryClient = new QueryClient();
-
-// Reset scroll position on every route change for a polished SPA feel.
-const ScrollToTop = () => {
-  const { pathname } = useLocation();
-  useEffect(() => {
-    window.scrollTo({ top: 0, behavior: "instant" as ScrollBehavior });
-  }, [pathname]);
-  return null;
-};
 
 const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
+        <PageLoader />
         <Toaster />
         <Sonner />
         <CustomCursor />

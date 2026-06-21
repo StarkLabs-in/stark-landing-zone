@@ -1,19 +1,49 @@
-import { useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
-import { ArrowRight, Sparkles, ChevronDown } from "lucide-react";
+import { ArrowRight, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import MagneticElement from "./MagneticElement";
 import Scene3D from "./Scene3D";
+import TypewriterText from "./TypewriterText";
 import Starfield from "./Starfield";
-import { fadeUp, stagger } from "@/lib/motion";
+import { useRef } from "react";
 
-const stats = [
-  { value: "4+", label: "AI Products Engineered" },
-  { value: "100%", label: "Production-Grade Systems" },
-  { value: "24/7", label: "Reliability by Design" },
-  { value: "∞", label: "Scale-Ready Architecture" },
-];
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.15,
+      delayChildren: 0.1,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 50, rotateX: 45, scale: 0.9 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    rotateX: 0,
+    scale: 1,
+    transition: {
+      duration: 0.8,
+      ease: [0.215, 0.61, 0.355, 1.0] as const,
+    },
+  },
+};
+
+const backgroundVariants = {
+  hidden: { opacity: 0, scale: 0.8 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    transition: {
+      duration: 1.2,
+      ease: "easeOut" as const,
+    },
+  },
+};
 
 const Hero = () => {
   const containerRef = useRef<HTMLElement>(null);
@@ -22,45 +52,58 @@ const Hero = () => {
     offset: ["start start", "end start"],
   });
 
-  // Parallax the whole background as the user scrolls out of the hero.
-  const bgOpacity = useTransform(scrollYProgress, [0, 0.6], [1, 0]);
-  const bgScale = useTransform(scrollYProgress, [0, 0.6], [1, 0.92]);
-  const bgY = useTransform(scrollYProgress, [0, 0.6], [0, 120]);
+  const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
+  const scale = useTransform(scrollYProgress, [0, 0.5], [1, 0.9]);
+  const y = useTransform(scrollYProgress, [0, 0.5], [0, 100]);
 
   return (
-    <section
+    <motion.section
       ref={containerRef}
+      initial="hidden"
+      animate="visible"
       className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20"
+      style={{ opacity }}
     >
-      {/* Animated background stack (starfield + WebGL scene), parallaxed on scroll */}
-      <motion.div style={{ opacity: bgOpacity, scale: bgScale, y: bgY }} className="absolute inset-0 z-0">
-        {/* 2D twinkling starfield */}
-        <Starfield />
-        {/* three.js / react-three-fiber centerpiece */}
-        <Scene3D scrollProgress={scrollYProgress} />
-      </motion.div>
+      <div className="absolute inset-0 perspective-1000">
+        <motion.div
+          style={{ scale, y }}
+          className="w-full h-full relative"
+        >
+          {/* Starfield Background */}
+          <Starfield />
+          {/* 3D Background Scene */}
+          <Scene3D scrollProgress={scrollYProgress} />
+        </motion.div>
+      </div>
 
-      {/* Background Grid Pattern - responds to cursor, fades at the edges */}
-      <div
-        className="absolute inset-0 grid-pattern grid-fade-mask opacity-20 z-0"
+      {/* Background Grid Pattern - responds to cursor */}
+      <motion.div
+        variants={backgroundVariants}
+        className="absolute inset-0 grid-pattern opacity-20"
         style={{
           transform: "translate3d(var(--parallax-x, 0), var(--parallax-y, 0), 0)",
           willChange: "transform",
         }}
       />
-
-      {/* Aurora gradient orbs - drift slowly and respond to the cursor for depth */}
-      <div
-        className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/15 rounded-full blur-[128px] animate-aurora z-0"
+      
+      {/* Gradient Orbs - respond to cursor with inverted movement for depth */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.5 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 1.5, delay: 0.3, ease: "easeOut" }}
+        className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/15 rounded-full blur-[128px] animate-pulse-glow"
         style={{
           transform: "translate3d(calc(var(--parallax-x, 0) * -1.5), calc(var(--parallax-y, 0) * -1.5), 0)",
           willChange: "transform",
         }}
       />
-      <div
-        className="absolute bottom-1/3 right-1/4 w-80 h-80 bg-purple-500/10 rounded-full blur-[110px] animate-aurora z-0"
-        style={{
-          animationDelay: "3s",
+      <motion.div
+        initial={{ opacity: 0, scale: 0.5 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 1.5, delay: 0.5, ease: "easeOut" }}
+        className="absolute bottom-1/3 right-1/4 w-80 h-80 bg-primary/10 rounded-full blur-[100px] animate-pulse-glow" 
+        style={{ 
+          animationDelay: "1s",
           transform: "translate3d(calc(var(--parallax-x, 0) * 1.2), calc(var(--parallax-y, 0) * 1.2), 0)",
           willChange: "transform",
         }}
@@ -68,15 +111,13 @@ const Hero = () => {
 
       <div className="container mx-auto px-6 relative z-10">
         <motion.div
-          variants={stagger(0.14, 0.05)}
-          initial="hidden"
-          animate="visible"
+          variants={containerVariants}
           className="max-w-4xl mx-auto text-center"
         >
           {/* Badge */}
           <motion.div
-            variants={fadeUp}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-secondary/70 backdrop-blur-sm border border-border mb-8"
+            variants={itemVariants}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-secondary border border-border mb-8"
           >
             <span className="relative flex h-2 w-2">
               <span className="absolute inline-flex h-full w-full rounded-full bg-primary opacity-75 animate-ping" />
@@ -86,18 +127,17 @@ const Hero = () => {
             <span className="text-sm text-muted-foreground">AI Engineering & Technology Company</span>
           </motion.div>
 
-          {/* Main Headline */}
-          <motion.h1
-            variants={fadeUp}
+          {/* Main Headline with Typewriter */}
+          <TypewriterText
+            text="Engineering Intelligence for the Real World"
             className="font-display text-4xl md:text-6xl lg:text-7xl font-bold leading-tight mb-6"
-          >
-            Engineering Intelligence{" "}
-            <span className="gradient-text-animated">for the Real World</span>
-          </motion.h1>
+            delay={0.5}
+            speed={40}
+          />
 
           {/* Subtitle */}
           <motion.p
-            variants={fadeUp}
+            variants={itemVariants}
             className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10"
           >
             AI platforms, tools, and systems built for scale, accuracy, and impact.
@@ -105,7 +145,7 @@ const Hero = () => {
 
           {/* CTA Buttons - Magnetic */}
           <motion.div
-            variants={fadeUp}
+            variants={itemVariants}
             className="flex flex-col sm:flex-row items-center justify-center gap-4"
           >
             <MagneticElement intensity={0.25}>
@@ -118,24 +158,11 @@ const Hero = () => {
             </MagneticElement>
             <MagneticElement intensity={0.25}>
               <a href="#contact">
-                <Button variant="outline" size="lg" className="text-lg px-8 py-6 border-border hover:bg-secondary">
+                <Button variant="outline" size="lg" className="text-lg px-8 py-6 border-border hover:bg-secondary btn-outline-glow">
                   Contact Starklabs
                 </Button>
               </a>
             </MagneticElement>
-          </motion.div>
-
-          {/* Trust / Stats band */}
-          <motion.div
-            variants={fadeUp}
-            className="grid grid-cols-2 md:grid-cols-4 gap-px mt-20 rounded-2xl overflow-hidden border border-border bg-border/50 max-w-3xl mx-auto"
-          >
-            {stats.map((stat) => (
-              <div key={stat.label} className="bg-card/80 backdrop-blur-sm px-4 py-6 text-center">
-                <div className="font-display text-2xl md:text-3xl font-bold gradient-text">{stat.value}</div>
-                <div className="text-xs text-muted-foreground mt-1 leading-snug">{stat.label}</div>
-              </div>
-            ))}
           </motion.div>
         </motion.div>
       </div>
@@ -153,8 +180,13 @@ const Hero = () => {
       </motion.a>
 
       {/* Bottom Gradient Fade */}
-      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent pointer-events-none z-[1]" />
-    </section>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 1, delay: 0.8 }}
+        className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent"
+      />
+    </motion.section>
   );
 };
 
