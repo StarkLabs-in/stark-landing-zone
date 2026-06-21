@@ -5,6 +5,7 @@ import {
   Laptop, ShieldCheck, MessageSquare,
   Brain, Code, Cpu, Terminal, GraduationCap, Users
 } from "lucide-react";
+import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -48,6 +49,7 @@ export default function FutureAiClub() {
   const [interestWhatsApp, setInterestWhatsApp] = useState("");
   const [interestEmail, setInterestEmail] = useState("");
   const [interestRole, setInterestRole] = useState("");
+  const [interestCommunity, setInterestCommunity] = useState("");
   const [interestSelectedList, setInterestSelectedList] = useState<string[]>([]);
   const [interestTiming, setInterestTiming] = useState("");
   const [interestWorkshop, setInterestWorkshop] = useState("");
@@ -60,7 +62,7 @@ export default function FutureAiClub() {
 
   const handleInterestSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!interestName || !interestWhatsApp || !interestRole || interestSelectedList.length === 0 || !interestTiming || !interestWorkshop) {
+    if (!interestName || !interestWhatsApp || !interestRole || !interestCommunity || interestSelectedList.length === 0 || !interestTiming || !interestWorkshop) {
       toast.error("Please fill in all required fields.");
       return;
     }
@@ -72,6 +74,7 @@ export default function FutureAiClub() {
         mobile_number: interestWhatsApp,
         email_address: interestEmail || "",
         student_name: interestRole,
+        community: interestCommunity,
         program: interestSelectedList.join(", "),
         preferred_batch: interestTiming,
         status: `interest_list_workshop_${interestWorkshop.toLowerCase().replace(/ /g, "_")}`
@@ -95,6 +98,7 @@ export default function FutureAiClub() {
     setInterestWhatsApp("");
     setInterestEmail("");
     setInterestRole("");
+    setInterestCommunity("");
     setInterestSelectedList([]);
     setInterestTiming("");
     setInterestWorkshop("");
@@ -215,29 +219,11 @@ export default function FutureAiClub() {
             creativity, and technology together. Open to students, parents, professionals, and lifelong learners.
           </motion.p>
 
-          {/* Trust Indicators */}
-          <motion.div
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-            className="flex justify-center gap-6 mt-2 mb-10 text-slate-400 text-sm flex-wrap font-display font-medium"
-          >
-            <span className="flex items-center gap-1.5">
-              <CheckCircle2 className="text-cyan-400 w-4 h-4" /> All Ages Welcome
-            </span>
-            <span className="flex items-center gap-1.5">
-              <CheckCircle2 className="text-cyan-400 w-4 h-4" /> No Experience Needed
-            </span>
-            <span className="flex items-center gap-1.5">
-              <CheckCircle2 className="text-cyan-400 w-4 h-4" /> Free Discovery Workshop Planned
-            </span>
-          </motion.div>
-
           {/* Action CTAs */}
           <motion.div
             initial={{ opacity: 0, y: 25 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
             className="flex flex-col sm:flex-row gap-5 justify-center items-center"
           >
             <Button
@@ -257,6 +243,49 @@ export default function FutureAiClub() {
               Learn More
             </Button>
           </motion.div>
+
+          {/* Micro Trust Bar */}
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            className="flex justify-center gap-6 mt-8 text-slate-400 text-sm flex-wrap font-display font-medium"
+          >
+            <span className="flex items-center gap-1.5">
+              <CheckCircle2 className="text-cyan-400 w-4 h-4" /> All Ages Welcome
+            </span>
+            <span className="flex items-center gap-1.5">
+              <CheckCircle2 className="text-cyan-400 w-4 h-4" /> No Experience Needed
+            </span>
+            <span className="flex items-center gap-1.5">
+              <CheckCircle2 className="text-cyan-400 w-4 h-4" /> Community Driven
+            </span>
+            <span className="flex items-center gap-1.5">
+              <CheckCircle2 className="text-cyan-400 w-4 h-4" /> Free Discovery Workshop Planned
+            </span>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ══════════════════════════════════════════════════ */}
+      {/* WHY WE'RE EXPLORING THIS                           */}
+      {/* ══════════════════════════════════════════════════ */}
+      <section className="py-24 relative z-10 border-t border-slate-900/60 bg-slate-950/60 backdrop-blur-sm">
+        <div className="container mx-auto px-6 max-w-4xl text-center">
+          <h2 className="text-3xl md:text-5xl font-bold font-display tracking-tight text-white mb-6">
+            Why We&apos;re Exploring This
+          </h2>
+          <div className="w-20 h-1 bg-gradient-to-r from-cyan-500 to-amber-500 mx-auto mb-10 rounded-full" />
+
+          <div className="p-8 rounded-2xl bg-slate-900/30 border border-slate-800/80 backdrop-blur-md space-y-6">
+            <p className="text-lg md:text-xl text-slate-300 leading-relaxed font-sans">
+              AI is changing how people learn, work, and create.
+            </p>
+            <p className="text-base md:text-lg text-slate-400 leading-relaxed font-sans">
+              Future AI Club is an experiment to see whether curious students, parents, professionals,
+              and technology enthusiasts would like a space to explore these topics together.
+            </p>
+          </div>
         </div>
       </section>
 
@@ -375,11 +404,12 @@ export default function FutureAiClub() {
               </h2>
               <div className="w-20 h-1 bg-gradient-to-r from-cyan-500 to-amber-500 rounded-full" />
               <p className="text-slate-300 leading-relaxed font-sans text-base md:text-lg">
-                We&apos;re intentionally starting small. The goal is to create a welcoming community where people
-                can learn, explore, and build together.
+                We&apos;re intentionally starting small. Before organizing workshops, we want to understand
+                whether there is enough community interest.
               </p>
               <p className="text-slate-400 leading-relaxed font-sans text-sm md:text-base">
-                Future workshops will be shaped by the interests of early members.
+                Future AI Club is being shaped together with its early members. The first community
+                participants will help influence future workshops, topics, and events.
               </p>
             </div>
 
@@ -548,6 +578,26 @@ export default function FutureAiClub() {
                       </select>
                     </div>
 
+                    {/* Community */}
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
+                        Which Community Do You Belong To? *
+                      </label>
+                      <select
+                        required
+                        value={interestCommunity}
+                        onChange={(e) => setInterestCommunity(e.target.value)}
+                        className="w-full bg-slate-900/60 border border-slate-800 rounded-lg p-3 text-white focus:outline-none focus:border-cyan-500 transition-colors"
+                      >
+                        <option value="" className="bg-slate-950 text-slate-500">Select your community...</option>
+                        <option value="Prestige Eden Park" className="bg-slate-950 text-white">Prestige Eden Park</option>
+                        <option value="Prestige Avalon Park" className="bg-slate-950 text-white">Prestige Avalon Park</option>
+                        <option value="Prestige Glenbrook" className="bg-slate-950 text-white">Prestige Glenbrook</option>
+                        <option value="Prestige High Fields" className="bg-slate-950 text-white">Prestige High Fields</option>
+                        <option value="Other" className="bg-slate-950 text-white">Other</option>
+                      </select>
+                    </div>
+
                     {/* Interests */}
                     <div>
                       <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">
@@ -651,30 +701,38 @@ export default function FutureAiClub() {
                   <motion.div
                     initial={{ scale: 0.95, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
-                    className="text-center space-y-6 py-6"
+                    transition={{ duration: 0.4 }}
+                    className="text-center space-y-6 py-6 px-2 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10"
                   >
-                    <div className="w-16 h-16 bg-emerald-500/10 border border-emerald-500/30 rounded-full flex items-center justify-center mx-auto text-emerald-400 text-3xl font-bold">
-                      ✓
-                    </div>
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ type: "spring", stiffness: 200, damping: 15, delay: 0.1 }}
+                      className="w-16 h-16 bg-emerald-500/10 border border-emerald-500/30 rounded-full flex items-center justify-center mx-auto text-emerald-400"
+                    >
+                      <CheckCircle2 className="w-8 h-8" />
+                    </motion.div>
 
                     <div className="space-y-3">
                       <h3 className="text-3xl font-bold font-display text-white">Thank You</h3>
                       <p className="text-slate-300 text-base max-w-md mx-auto leading-relaxed">
-                        Thank you for your interest.
+                        Thank you for your interest in Future AI Club.
                       </p>
                       <p className="text-slate-400 text-sm max-w-md mx-auto leading-relaxed">
-                        We&apos;re currently exploring whether there is enough community interest to launch Future
-                        AI Club. We&apos;ll keep you informed about future workshops and community events.
+                        We&apos;re currently exploring whether there is enough community interest to launch
+                        workshops and learning events.
+                      </p>
+                      <p className="text-slate-400 text-sm max-w-md mx-auto leading-relaxed">
+                        We&apos;ll keep you informed about future discovery workshops and community activities.
                       </p>
                     </div>
 
                     <div className="pt-6">
                       <Button
-                        type="button"
-                        onClick={resetInterestForm}
+                        asChild
                         className="bg-cyan-500 hover:bg-cyan-600 text-slate-950 font-bold px-8 py-3 rounded-lg transition-colors"
                       >
-                        Close
+                        <Link to="/">Return to Homepage</Link>
                       </Button>
                     </div>
                   </motion.div>

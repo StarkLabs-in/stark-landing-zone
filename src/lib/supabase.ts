@@ -71,6 +71,7 @@ interface MockLead {
   student_age?: number;
   program?: string;
   preferred_batch?: string;
+  community?: string;
   status: string;
   created_at: string;
 }

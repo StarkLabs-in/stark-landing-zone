@@ -64,6 +64,7 @@ CREATE TABLE IF NOT EXISTS leads (
     student_age INT,
     program TEXT,
     preferred_batch TEXT,
+    community TEXT,
     status TEXT DEFAULT 'waiting_list',
     created_at TIMESTAMP WITH TIME ZONE DEFAULT now()
 );
