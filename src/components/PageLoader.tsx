@@ -313,7 +313,7 @@ const PageLoader = () => {
               className="mt-64 flex flex-col items-center gap-3"
             >
               <span className="text-[10px] font-mono text-primary uppercase tracking-[0.4em]">
-                Rendering Reality
+                AI Engineering · Initializing
               </span>
               <span className="font-display text-2xl font-light tracking-widest text-foreground">
                 STARK<span className="text-primary">LABS</span>
@@ -354,7 +354,7 @@ const PageLoader = () => {
                 {bootLines[logIndex]}
               </motion.span>
               <div className="hidden sm:flex gap-4 text-muted-foreground/60">
-                <span>SYS_v4.0.2</span>
+                <span>STARKLABS//OS</span>
                 <span className="text-primary">● ONLINE</span>
               </div>
             </div>
