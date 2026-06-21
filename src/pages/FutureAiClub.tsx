@@ -308,7 +308,7 @@ export default function FutureAiClub() {
             />
             <div>
               <h2 className="text-3xl md:text-5xl font-bold font-display tracking-tight text-white mb-4">
-                Why We&apos;re Exploring This
+                AI is the next Future
               </h2>
               <div className="w-20 h-1 bg-gradient-to-r from-cyan-500 to-amber-500 mb-6 rounded-full" />
               <p className="text-lg text-slate-300 leading-relaxed font-sans">
@@ -382,33 +382,6 @@ export default function FutureAiClub() {
                 <p className="text-slate-400 text-sm leading-relaxed">{card.desc}</p>
               </div>
             ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ══════════════════════════════════════════════════ */}
-      {/* STARTING SMALL — VISUAL TRUST BANNER               */}
-      {/* ══════════════════════════════════════════════════ */}
-      <section className="py-24 relative z-10 border-t border-slate-900/60 bg-slate-950/40 backdrop-blur-sm">
-        <div className="container mx-auto px-6 max-w-5xl">
-          <div className="relative rounded-3xl overflow-hidden border border-slate-800/80">
-            <SmartImage
-              src={IMAGES.communityMeetupImage}
-              alt="A small group discussion"
-              className="aspect-[16/9] md:aspect-[21/9]"
-            />
-            <div className="absolute inset-0 bg-gradient-to-r from-slate-950/95 via-slate-950/70 to-slate-950/30" />
-            <div className="absolute inset-0 flex flex-col items-start justify-center p-8 md:p-14 max-w-lg">
-              <span className="text-amber-500 font-display text-sm font-semibold tracking-wider uppercase mb-3 block">
-                Our Philosophy
-              </span>
-              <h2 className="text-3xl md:text-4xl font-bold font-display tracking-tight text-white mb-4">
-                We&apos;re Intentionally Starting Small
-              </h2>
-              <p className="text-slate-300 leading-relaxed font-sans">
-                Future AI Club is being shaped together with its earliest members.
-              </p>
-            </div>
           </div>
         </div>
       </section>
