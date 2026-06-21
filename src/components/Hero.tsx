@@ -106,7 +106,7 @@ const Hero = () => {
           animationDelay: "1s",
           transform: "translate3d(calc(var(--parallax-x, 0) * 1.2), calc(var(--parallax-y, 0) * 1.2), 0)",
           willChange: "transform",
-        }} 
+        }}
       />
 
       <div className="container mx-auto px-6 relative z-10">
@@ -119,6 +119,10 @@ const Hero = () => {
             variants={itemVariants}
             className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-secondary border border-border mb-8"
           >
+            <span className="relative flex h-2 w-2">
+              <span className="absolute inline-flex h-full w-full rounded-full bg-primary opacity-75 animate-ping" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-primary" />
+            </span>
             <Sparkles className="w-4 h-4 text-primary" />
             <span className="text-sm text-muted-foreground">AI Engineering & Technology Company</span>
           </motion.div>
@@ -146,9 +150,9 @@ const Hero = () => {
           >
             <MagneticElement intensity={0.25}>
               <Link to="/products">
-                <Button size="lg" className="glow-effect text-lg px-8 py-6">
+                <Button size="lg" className="glow-effect shimmer-on-hover text-lg px-8 py-6">
                   Explore Products
-                  <ArrowRight className="ml-2 w-5 h-5" />
+                  <ArrowRight className="ml-2 w-5 h-5 transition-transform group-hover:translate-x-1" />
                 </Button>
               </Link>
             </MagneticElement>
@@ -162,6 +166,18 @@ const Hero = () => {
           </motion.div>
         </motion.div>
       </div>
+
+      {/* Animated scroll cue */}
+      <motion.a
+        href="#about"
+        aria-label="Scroll to content"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 1.2, duration: 0.6 }}
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 text-muted-foreground hover:text-primary transition-colors"
+      >
+        <ChevronDown className="w-6 h-6 animate-scroll-cue" />
+      </motion.a>
 
       {/* Bottom Gradient Fade */}
       <motion.div

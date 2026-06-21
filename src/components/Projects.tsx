@@ -46,10 +46,10 @@ const projects = [
     link: "/products/competitive-habit-tracker",
   },
   {
-    icon: Stars,
-    title: "Neural Tarot",
-    description: "AI-powered astrology and numerology insights platform. Advanced LLM integration for personalized, meaningful interpretations.",
-    link: "/products/neural-tarot",
+    icon: Cpu,
+    title: "Future AI Club",
+    description: "An AI & technology learning community exploring AI, coding, and digital creativity through hands-on workshops. Beginner-friendly and open to all ages.",
+    link: "/products/future-ai-club",
   },
   {
     icon: Rocket,
@@ -110,9 +110,9 @@ const Projects = () => {
                   </p>
                   <MagneticElement intensity={0.2}>
                     <Link to={project.link}>
-                      <Button variant="outline" className="w-full border-border hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all">
+                      <Button variant="outline" className="group/btn w-full border-border hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all">
                         Learn More
-                        <ArrowRight className="ml-2 w-4 h-4" />
+                        <ArrowRight className="ml-2 w-4 h-4 transition-transform duration-300 group-hover/btn:translate-x-1" />
                       </Button>
                     </Link>
                   </MagneticElement>

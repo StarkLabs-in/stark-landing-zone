@@ -35,11 +35,21 @@ const technologies = [
   "Computer Vision",
   "NLP",
   "Cloud-Native",
+  "Vector Databases",
+  "MLOps",
+  "Kubernetes",
+  "Edge AI",
 ];
+
+const Pill = ({ tech }: { tech: string }) => (
+  <span className="px-5 py-2.5 rounded-full bg-secondary border border-border text-foreground font-medium text-sm whitespace-nowrap hover:border-primary/50 hover:bg-primary/10 transition-all cursor-default">
+    {tech}
+  </span>
+);
 
 const TechStack = () => {
   return (
-    <section className="py-20 relative">
+    <section className="py-20 relative overflow-hidden">
       <div className="container mx-auto px-6">
         {/* Section Header */}
         <div className="text-center mb-12">
