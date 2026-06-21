@@ -90,7 +90,7 @@ const WhyStarklabs = () => {
             >
               <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-5">
                 <reason.icon className="w-8 h-8 text-primary" />
-              </motion.div>
+              </div>
               <h3 className="font-display text-lg font-semibold mb-2 text-foreground">
                 {reason.title}
               </h3>

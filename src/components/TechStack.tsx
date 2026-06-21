@@ -86,7 +86,7 @@ const TechStack = () => {
               {tech}
             </motion.div>
           ))}
-        </div>
+        </motion.div>
       </div>
     </section>
   );
