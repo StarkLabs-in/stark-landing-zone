@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Sparkles, ArrowRight, CheckCircle2, ImageIcon
+  Sparkles, ArrowRight, CheckCircle2, ImageIcon,
+  Brain, Code, Cpu, Laptop, ShieldCheck, MessageSquare
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -27,29 +28,6 @@ const IMAGES = {
   techEnthusiastsImage: "https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?auto=format&fit=crop&w=600&q=80",
   curiousBeginnersImage: "https://images.unsplash.com/photo-1605379399642-870262d3d051?auto=format&fit=crop&w=600&q=80",
   lifelongLearnersImage: "https://images.unsplash.com/photo-1559136555-9303baea8ebd?auto=format&fit=crop&w=600&q=80",
-
-  // What We Hope To Explore Together
-  aiToolsImage: "https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&w=600&q=80",
-  codingWorkshopImage: "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&w=600&q=80",
-  creativeProjectsImage: "https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=600&q=80",
-  websitesImage: "https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?auto=format&fit=crop&w=600&q=80",
-  problemSolvingImage: "https://images.unsplash.com/photo-1573497620053-ea5300f94f21?auto=format&fit=crop&w=600&q=80",
-  technologyDiscussionImage: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=600&q=80",
-
-  // Community Gallery
-  galleryWorkshop: "https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=700&q=80",
-  galleryParentLearning: "https://images.unsplash.com/photo-1515187029135-18ee286d815b?auto=format&fit=crop&w=700&q=80",
-  galleryStudentsBuilding: "https://images.unsplash.com/photo-1600880292203-757bb62b4baf?auto=format&fit=crop&w=700&q=80",
-  galleryCollaboration: "https://images.unsplash.com/photo-1551434678-e076c223a692?auto=format&fit=crop&w=700&q=80",
-  galleryTechDiscussion: "https://images.unsplash.com/photo-1531538606174-0f90ff5dce83?auto=format&fit=crop&w=700&q=80",
-  galleryProjectShowcase: "https://images.unsplash.com/photo-1543269865-cbf427effbad?auto=format&fit=crop&w=700&q=80",
-
-  // What Happens Next
-  stepSignupImage: "https://images.unsplash.com/photo-1556761175-4b46a572b786?auto=format&fit=crop&w=500&q=80",
-  stepWorkshopImage: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=500&q=80",
-  stepCommunityImage: "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=500&q=80",
-  stepBuildImage: "https://images.unsplash.com/photo-1600880292089-90a7e086ee0c?auto=format&fit=crop&w=500&q=80",
-  projectShowcaseImage: "https://images.unsplash.com/photo-1543269865-cbf427effbad?auto=format&fit=crop&w=500&q=80",
 
   // Starting Small trust banner
   communityMeetupImage: "https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=1400&q=80",
@@ -374,7 +352,7 @@ export default function FutureAiClub() {
       {/* ══════════════════════════════════════════════════ */}
       <section className="py-24 relative z-10 border-t border-slate-900/60 bg-slate-950/60 backdrop-blur-sm">
         <div className="container mx-auto px-6 max-w-5xl">
-          <div className="text-center mb-12">
+          <div className="text-center mb-16">
             <span className="text-cyan-500 font-display text-sm font-semibold tracking-wider uppercase mb-2 block">
               Exploratory Tracks
             </span>
@@ -384,56 +362,25 @@ export default function FutureAiClub() {
             <div className="w-20 h-1 bg-gradient-to-r from-cyan-500 to-amber-500 mx-auto mt-4 rounded-full" />
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
-              { label: "AI Tools", image: IMAGES.aiToolsImage },
-              { label: "Coding Basics", image: IMAGES.codingWorkshopImage },
-              { label: "Creative Projects", image: IMAGES.creativeProjectsImage },
-              { label: "Websites", image: IMAGES.websitesImage },
-              { label: "Problem Solving", image: IMAGES.problemSolvingImage },
-              { label: "Technology Discussions", image: IMAGES.technologyDiscussionImage },
+              { title: "AI Tools", desc: "Learning to use AI systems for writing, image creation, and project acceleration.", icon: <Brain className="w-6 h-6 text-cyan-400" /> },
+              { title: "Coding Basics", desc: "Getting comfortable with fundamental scripting, structures, and systems.", icon: <Code className="w-6 h-6 text-amber-500" /> },
+              { title: "Creative Projects", desc: "Applying computational methods to design interactive games and digital arts.", icon: <Cpu className="w-6 h-6 text-cyan-400" /> },
+              { title: "Websites", desc: "Understanding the layouts and architecture required to share ideas online.", icon: <Laptop className="w-6 h-6 text-amber-500" /> },
+              { title: "Problem Solving", desc: "Breaking down complex logical tasks into automated step-by-step operations.", icon: <ShieldCheck className="w-6 h-6 text-cyan-400" /> },
+              { title: "Technology Discussions", desc: "Exploring safety guidelines, emerging frameworks, and digital community concepts.", icon: <MessageSquare className="w-6 h-6 text-amber-500" /> },
             ].map((card, idx) => (
-              <ImageCard key={card.label} image={card.image} label={card.label} idx={idx} />
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ══════════════════════════════════════════════════ */}
-      {/* COMMUNITY GALLERY                                  */}
-      {/* ══════════════════════════════════════════════════ */}
-      <section className="py-24 relative z-10 border-t border-slate-900/60 bg-slate-950/40 backdrop-blur-sm">
-        <div className="container mx-auto px-6 max-w-5xl">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-5xl font-bold font-display tracking-tight text-white">
-              Imagine What We Could Build Together
-            </h2>
-            <div className="w-20 h-1 bg-gradient-to-r from-cyan-500 to-amber-500 mx-auto mt-4 rounded-full" />
-          </div>
-
-          <div className="columns-2 md:columns-3 gap-4 [&>*]:mb-4">
-            {[
-              { image: IMAGES.galleryWorkshop, caption: "Small workshop group", ratio: "aspect-[4/5]" },
-              { image: IMAGES.galleryParentLearning, caption: "Parent learning AI", ratio: "aspect-square" },
-              { image: IMAGES.galleryStudentsBuilding, caption: "Students building projects", ratio: "aspect-[4/3]" },
-              { image: IMAGES.galleryCollaboration, caption: "People collaborating", ratio: "aspect-square" },
-              { image: IMAGES.galleryTechDiscussion, caption: "Technology discussion", ratio: "aspect-[4/5]" },
-              { image: IMAGES.galleryProjectShowcase, caption: "Project showcase", ratio: "aspect-[4/3]" },
-            ].map((g, idx) => (
-              <motion.div
-                key={g.caption}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: idx * 0.06 }}
-                className="relative rounded-2xl overflow-hidden border border-slate-800/80 break-inside-avoid"
+              <div
+                key={idx}
+                className="p-6 rounded-xl bg-slate-900/20 border border-slate-800/80 hover:border-cyan-500/20 transition-all duration-300 hover:translate-y-[-4px] backdrop-blur-md group"
               >
-                <SmartImage src={g.image} alt={g.caption} className={g.ratio} />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-transparent to-transparent" />
-                <span className="absolute bottom-3 left-3 right-3 px-2.5 py-1.5 rounded-lg bg-white/10 backdrop-blur-md border border-white/10 text-[11px] font-medium text-white">
-                  {g.caption}
-                </span>
-              </motion.div>
+                <div className="mb-4 p-2.5 bg-slate-950/60 border border-slate-800/80 rounded-lg w-fit group-hover:scale-110 transition-transform">
+                  {card.icon}
+                </div>
+                <h3 className="text-xl font-bold font-display text-white mb-2">{card.title}</h3>
+                <p className="text-slate-400 text-sm leading-relaxed">{card.desc}</p>
+              </div>
             ))}
           </div>
         </div>
@@ -467,11 +414,11 @@ export default function FutureAiClub() {
       </section>
 
       {/* ══════════════════════════════════════════════════ */}
-      {/* WHAT HAPPENS NEXT — VISUAL STEP CARDS               */}
+      {/* WHAT HAPPENS NEXT — 5-STEP TIMELINE                */}
       {/* ══════════════════════════════════════════════════ */}
       <section className="py-24 relative z-10 border-t border-slate-900/60 bg-slate-950/60 backdrop-blur-sm">
         <div className="container mx-auto px-6 max-w-5xl">
-          <div className="text-center mb-12">
+          <div className="text-center mb-16">
             <span className="text-cyan-500 font-display text-sm font-semibold tracking-wider uppercase mb-2 block">
               The Roadmap
             </span>
@@ -479,38 +426,36 @@ export default function FutureAiClub() {
               What Happens Next?
             </h2>
             <div className="w-20 h-1 bg-gradient-to-r from-cyan-500 to-amber-500 mx-auto mt-4 rounded-full" />
+            <p className="text-slate-400 mt-4 max-w-md mx-auto text-sm">
+              Five structured phases to align workshops to real community needs.
+            </p>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-5">
-            {[
-              { step: "01", title: "Join Interest List", image: IMAGES.stepSignupImage },
-              { step: "02", title: "Discovery Workshop", image: IMAGES.stepWorkshopImage },
-              { step: "03", title: "Meet Community", image: IMAGES.stepCommunityImage },
-              { step: "04", title: "Build Together", image: IMAGES.stepBuildImage },
-              { step: "05", title: "Continue Learning", image: IMAGES.projectShowcaseImage },
-            ].map((item, idx) => (
-              <motion.div
-                key={item.step}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: idx * 0.08 }}
-                className="group relative rounded-2xl overflow-hidden border border-slate-800/80 hover:border-cyan-500/40 transition-colors duration-300"
-              >
-                <SmartImage
-                  src={item.image}
-                  alt={item.title}
-                  className="aspect-[3/4] [&>img]:transition-transform [&>img]:duration-500 group-hover:[&>img]:scale-110"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/95 via-slate-950/30 to-transparent" />
-                <span className="absolute top-3 left-3 text-[10px] font-mono uppercase tracking-wider text-cyan-400">
-                  Step {item.step}
-                </span>
-                <span className="absolute bottom-3 left-3 right-3 font-display font-semibold text-white text-sm leading-snug">
-                  {item.title}
-                </span>
-              </motion.div>
-            ))}
+          <div className="relative">
+            {/* Desktop horizontal track */}
+            <div className="absolute top-8 left-10 right-10 h-0.5 bg-slate-800/80 hidden md:block z-0" />
+
+            <div className="grid grid-cols-1 md:grid-cols-5 gap-8 relative z-10">
+              {[
+                { step: "01", title: "Join Interest List", desc: "Share your roles, preferred schedules, and exploration goals." },
+                { step: "02", title: "Free Discovery Workshop", desc: "If demand is validated, we organise a live interactive session." },
+                { step: "03", title: "Meet the Community", desc: "Collaborate, share profiles, and discuss build projects." },
+                { step: "04", title: "Build Together", desc: "Launch collaborative code sprints and hands-on workshops." },
+                { step: "05", title: "Decide Whether To Continue", desc: "Choose whether you'd like scheduled learning paths." },
+              ].map((item, idx) => (
+                <div key={idx} className="space-y-4 md:text-center group">
+                  <div className="flex items-center md:justify-center gap-4 md:flex-col">
+                    <div className="w-16 h-16 rounded-full bg-slate-900 border-2 border-slate-800 group-hover:border-cyan-500 transition-all flex items-center justify-center font-display font-bold text-lg text-cyan-400 shadow-md">
+                      {item.step}
+                    </div>
+                  </div>
+                  <div className="space-y-2 pl-2 md:pl-0">
+                    <h3 className="text-lg font-bold font-display text-white">{item.title}</h3>
+                    <p className="text-slate-400 text-xs leading-relaxed max-w-xs md:mx-auto">{item.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
