@@ -237,7 +237,7 @@ export default function FutureAiClub() {
                 onClick={() => setIsInterestModalOpen(true)}
                 className="bg-cyan-500 hover:bg-cyan-600 text-slate-950 font-bold text-lg px-8 py-6 rounded-lg w-full sm:w-auto transition-all duration-300 transform hover:scale-105 shadow-[0_0_25px_rgba(6,182,212,0.4)]"
               >
-                Join the Interest List
+                Become an Early Explorer
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
               <Button
@@ -308,7 +308,7 @@ export default function FutureAiClub() {
             />
             <div>
               <h2 className="text-3xl md:text-5xl font-bold font-display tracking-tight text-white mb-4">
-                AI is the next Future
+                A Vision for the Future
               </h2>
               <div className="w-20 h-1 bg-gradient-to-r from-cyan-500 to-amber-500 mb-6 rounded-full" />
               <p className="text-lg text-slate-300 leading-relaxed font-sans">
@@ -327,7 +327,7 @@ export default function FutureAiClub() {
         <div className="container mx-auto px-6 max-w-5xl">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-5xl font-bold font-display tracking-tight text-white">
-              Who Might Be Interested?
+              A Community for Curious Minds
             </h2>
             <div className="w-20 h-1 bg-gradient-to-r from-cyan-500 to-amber-500 mx-auto mt-4 rounded-full" />
           </div>
@@ -357,7 +357,7 @@ export default function FutureAiClub() {
               Exploratory Tracks
             </span>
             <h2 className="text-3xl md:text-5xl font-bold font-display tracking-tight text-white">
-              What We Hope To Explore Together
+              Areas We&apos;ll Explore Together
             </h2>
             <div className="w-20 h-1 bg-gradient-to-r from-cyan-500 to-amber-500 mx-auto mt-4 rounded-full" />
           </div>
@@ -396,7 +396,7 @@ export default function FutureAiClub() {
               The Roadmap
             </span>
             <h2 className="text-3xl md:text-5xl font-bold font-display tracking-tight text-white">
-              What Happens Next?
+              Your Journey Starts Here
             </h2>
             <div className="w-20 h-1 bg-gradient-to-r from-cyan-500 to-amber-500 mx-auto mt-4 rounded-full" />
             <p className="text-slate-400 mt-4 max-w-md mx-auto text-sm">
@@ -450,7 +450,7 @@ export default function FutureAiClub() {
                 <div className="flex items-center gap-2">
                   <div className="w-2.5 h-2.5 rounded-full bg-cyan-500 animate-pulse" />
                   <span className="font-display font-semibold text-cyan-400 text-sm tracking-wider uppercase">
-                    Join the Interest List
+                    Become an Early Explorer
                   </span>
                 </div>
                 <button
@@ -643,7 +643,7 @@ export default function FutureAiClub() {
                         disabled={isInterestSubmitting}
                         className="w-full bg-gradient-to-r from-cyan-500 to-amber-500 text-slate-950 font-bold hover:scale-[1.02] transition-transform py-6 text-base shadow-[0_0_20px_rgba(245,158,11,0.2)]"
                       >
-                        {isInterestSubmitting ? "Submitting..." : "Join the Interest List"}
+                        {isInterestSubmitting ? "Submitting..." : "Become an Early Explorer"}
                       </Button>
                     </div>
                   </form>
