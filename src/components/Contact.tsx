@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { Mail, MapPin, Github } from "lucide-react";
+import { scaleIn } from "@/lib/motion";
 import RevealText from "./RevealText";
 
 const Contact = () => {

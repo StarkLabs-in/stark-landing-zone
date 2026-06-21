@@ -1,17 +1,85 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  Sparkles, ArrowRight, ArrowLeft, Check, CheckCircle2, 
-  Calendar, Clock, Laptop, Wifi, ShieldCheck, Mail, MessageSquare, 
-  Award, Brain, Code, Cpu, Gamepad2, Smartphone, Terminal, GraduationCap, Users
+import {
+  Sparkles, ArrowRight, CheckCircle2, ImageIcon,
+  Brain, Code, Cpu, Laptop, ShieldCheck, MessageSquare
 } from "lucide-react";
+import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
-import { supabase } from "@/lib/supabase";
-import { sendWelcomeEmail, getWhatsAppRedirectLink, postWhatsAppWebhook } from "@/lib/emailService";
+import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { toast } from "sonner";
 import FutureAiClubScene from "@/components/FutureAiClubScene";
+import DemoModeBanner from "@/components/DemoModeBanner";
+
+/* ------------------------------------------------------------------ */
+/* Centralized image constants — swap any of these for real photos    */
+/* later without touching layout code. Style: people-first,           */
+/* collaborative learning. No robots, hardware kits, or boardrooms.   */
+/* ------------------------------------------------------------------ */
+const IMAGES = {
+  heroCommunityImage: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=900&q=80",
+
+  // Who Might Be Interested
+  studentsLearningImage: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=600&q=80",
+  parentLearningImage: "https://images.unsplash.com/photo-1573164713988-8665fc963095?auto=format&fit=crop&w=600&q=80",
+  professionalsImage: "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=600&q=80",
+  techEnthusiastsImage: "https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?auto=format&fit=crop&w=600&q=80",
+  curiousBeginnersImage: "https://images.unsplash.com/photo-1605379399642-870262d3d051?auto=format&fit=crop&w=600&q=80",
+  lifelongLearnersImage: "https://images.unsplash.com/photo-1559136555-9303baea8ebd?auto=format&fit=crop&w=600&q=80",
+
+  // Starting Small trust banner
+  communityMeetupImage: "https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=1400&q=80",
+};
+
+/* ------------------------------------------------------------------ */
+/* Image with a graceful on-brand fallback so the layout never breaks  */
+/* if a URL fails — shows a dark gradient + icon instead.              */
+/* ------------------------------------------------------------------ */
+function SmartImage({ src, alt, className = "" }: { src: string; alt: string; className?: string }) {
+  const [failed, setFailed] = useState(false);
+  return (
+    <div className={`relative overflow-hidden bg-slate-900 ${className}`}>
+      {!failed ? (
+        <img
+          src={src}
+          alt={alt}
+          loading="lazy"
+          onError={() => setFailed(true)}
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+      ) : (
+        <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-950 to-slate-900">
+          <ImageIcon className="w-8 h-8 text-cyan-500/40" />
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* Visual-led card: image + short label, used for audience & topic grids. */
+function ImageCard({ image, label, idx = 0 }: { image: string; label: string; idx?: number }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.35, delay: idx * 0.05 }}
+      className="group relative rounded-2xl overflow-hidden border border-slate-800/80 hover:border-cyan-500/40 transition-colors duration-300"
+    >
+      <SmartImage
+        src={image}
+        alt={label}
+        className="aspect-[4/3] [&>img]:transition-transform [&>img]:duration-500 group-hover:[&>img]:scale-110"
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-slate-950/95 via-slate-950/20 to-transparent" />
+      <span className="absolute bottom-3 left-4 right-4 font-display font-semibold text-white text-sm sm:text-base">
+        {label}
+      </span>
+    </motion.div>
+  );
+}
 
 export default function FutureAiClub() {
   // Page SEO tags injection
@@ -38,7 +106,6 @@ export default function FutureAiClub() {
   // ──────────────────────────────────────────────────────
   // NEW INTEREST VALIDATION STATES
   // ──────────────────────────────────────────────────────
-  const [isIntro, setIsIntro] = useState(true);
   const [isInterestModalOpen, setIsInterestModalOpen] = useState(false);
   const [isInterestSubmitting, setIsInterestSubmitting] = useState(false);
   const [interestSubmitted, setInterestSubmitted] = useState(false);
@@ -48,6 +115,7 @@ export default function FutureAiClub() {
   const [interestWhatsApp, setInterestWhatsApp] = useState("");
   const [interestEmail, setInterestEmail] = useState("");
   const [interestRole, setInterestRole] = useState("");
+  const [interestCommunity, setInterestCommunity] = useState("");
   const [interestSelectedList, setInterestSelectedList] = useState<string[]>([]);
   const [interestTiming, setInterestTiming] = useState("");
   const [interestWorkshop, setInterestWorkshop] = useState("");
@@ -60,7 +128,7 @@ export default function FutureAiClub() {
 
   const handleInterestSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!interestName || !interestWhatsApp || !interestRole || interestSelectedList.length === 0 || !interestTiming || !interestWorkshop) {
+    if (!interestName || !interestWhatsApp || !interestRole || !interestCommunity || interestSelectedList.length === 0 || !interestTiming || !interestWorkshop) {
       toast.error("Please fill in all required fields.");
       return;
     }
@@ -72,6 +140,7 @@ export default function FutureAiClub() {
         mobile_number: interestWhatsApp,
         email_address: interestEmail || "",
         student_name: interestRole,
+        community: interestCommunity,
         program: interestSelectedList.join(", "),
         preferred_batch: interestTiming,
         status: `interest_list_workshop_${interestWorkshop.toLowerCase().replace(/ /g, "_")}`
@@ -95,6 +164,7 @@ export default function FutureAiClub() {
     setInterestWhatsApp("");
     setInterestEmail("");
     setInterestRole("");
+    setInterestCommunity("");
     setInterestSelectedList([]);
     setInterestTiming("");
     setInterestWorkshop("");
@@ -107,427 +177,145 @@ export default function FutureAiClub() {
     if (el) el.scrollIntoView({ behavior: "smooth" });
   };
 
-  // Auto-dismiss intro after 2 seconds
-  useEffect(() => {
-    const timer = setTimeout(() => setIsIntro(false), 2000);
-    return () => clearTimeout(timer);
-  }, []);
-
-  // ──────────────────────────────────────────────────────
-  // FUTURE COHORT REGISTRATION - TEMPORARILY DISABLED
-  // All state below is retained so the code stays recoverable.
-  // ──────────────────────────────────────────────────────
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [activeStep, setActiveStep] = useState(1);
-  const [isWaitlistOnly, setIsWaitlistOnly] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [successData, setSuccessData] = useState<{
-    registrationId?: string;
-    studentName: string;
-    parentName: string;
-    phone: string;
-    program: string;
-    batch: string;
-    isWaitlist: boolean;
-  } | null>(null);
-
-  const [studentName, setStudentName] = useState("");
-  const [studentAge, setStudentAge] = useState("");
-  const [studentDob, setStudentDob] = useState("");
-  const [schoolName, setSchoolName] = useState("");
-  const [gradeClass, setGradeClass] = useState("");
-  const [gender, setGender] = useState("");
-
-  const [parentName, setParentName] = useState("");
-  const [mobileNumber, setMobileNumber] = useState("");
-  const [whatsappNumber, setWhatsappNumber] = useState("");
-  const [sameAsMobile, setSameAsMobile] = useState(false);
-  const [parentEmail, setParentEmail] = useState("");
-  const [occupation, setOccupation] = useState("");
-  const [companyName, setCompanyName] = useState("");
-
-  const [learningTools, setLearningTools] = useState({
-    scratch: false,
-    python: false,
-    chatgpt: false,
-    roboticsKits: false,
-    none: false,
-  });
-  const [techInterests, setTechInterests] = useState<string[]>([]);
-
-  const [laptopAvailable, setLaptopAvailable] = useState<boolean | null>(null);
-  const [operatingSystem, setOperatingSystem] = useState("");
-  const [internetAvailable, setInternetAvailable] = useState<boolean | null>(null);
-
-  const [preferredBatch, setPreferredBatch] = useState("");
-
-  const [demoDate, setDemoDate] = useState("");
-  const [demoTimeSlot, setDemoTimeSlot] = useState("");
-
-  const [consentProject, setConsentProject] = useState(false);
-  const [consentComm, setConsentComm] = useState(false);
-  const [consentTerms, setConsentTerms] = useState(false);
-
-  const getAutoProgram = (age: number) => {
-    if (age >= 8 && age <= 11) return "Junior Innovators (Age 8-11)";
-    if (age >= 12 && age <= 14) return "AI Explorers (Age 12-14)";
-    if (age >= 15 && age <= 17) return "Future Builders (Age 15-17)";
-    return "";
-  };
-
-  const programName = studentAge ? getAutoProgram(parseInt(studentAge, 10)) : "";
-
-  useEffect(() => {
-    if (sameAsMobile) setWhatsappNumber(mobileNumber);
-  }, [mobileNumber, sameAsMobile]);
-
-  const [slotCount, setSlotCount] = useState(0);
-  const [checkingSlots, setCheckingSlots] = useState(false);
-
-  useEffect(() => {
-    if (demoDate && demoTimeSlot) {
-      setCheckingSlots(true);
-      supabase
-        .from("registrations")
-        .select("id")
-        .eq("demo_date", demoDate)
-        .eq("demo_time_slot", demoTimeSlot)
-        .then(({ data, error }: any) => {
-          setCheckingSlots(false);
-          if (error) {
-            console.error("Error checking slots:", error);
-          } else {
-            const count = data?.length || 0;
-            setSlotCount(count);
-            if (count >= 20) {
-              setIsWaitlistOnly(true);
-              toast.warning("This slot is currently full. Submitting will register you to the waiting list.");
-            } else {
-              setIsWaitlistOnly(false);
-            }
-          }
-        });
-    }
-  }, [demoDate, demoTimeSlot]);
-
-  const handleInterestToggle = (interest: string) => {
-    setTechInterests(prev =>
-      prev.includes(interest)
-        ? prev.filter(i => i !== interest)
-        : [...prev, interest]
-    );
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!consentProject || !consentComm || !consentTerms) {
-      toast.error("Please agree to all consent check boxes to continue.");
-      return;
-    }
-
-    setIsSubmitting(true);
-
-    try {
-      const { error: parentError } = await supabase
-        .from("parents")
-        .insert({
-          parent_name: parentName,
-          mobile_number: mobileNumber,
-          whatsapp_number: whatsappNumber,
-          email_address: parentEmail,
-          occupation,
-          company_name: companyName,
-        });
-
-      if (parentError) throw parentError;
-
-      const parentsList = await supabase.from("parents").select("*");
-      const savedParent = parentsList.data?.find((p: any) => p.email_address === parentEmail) || { id: crypto.randomUUID() };
-
-      const { error: studentError } = await supabase
-        .from("students")
-        .insert({
-          student_name: studentName,
-          age: parseInt(studentAge, 10),
-          date_of_birth: studentDob,
-          school_name: schoolName,
-          grade_class: gradeClass,
-          gender: gender || null,
-        });
-
-      if (studentError) throw studentError;
-
-      const studentsList = await supabase.from("students").select("*");
-      const savedStudent = studentsList.data?.find((s: any) => s.student_name === studentName) || { id: crypto.randomUUID() };
-
-      const finalStatus = isWaitlistOnly ? "waiting_list" : "confirmed";
-
-      const { error: regError } = await supabase
-        .from("registrations")
-        .insert({
-          student_id: savedStudent.id,
-          parent_id: savedParent.id,
-          scratch: learningTools.scratch,
-          python: learningTools.python,
-          chatgpt: learningTools.chatgpt,
-          robotics_kits: learningTools.roboticsKits,
-          none_used: learningTools.none,
-          interests: techInterests,
-          laptop_available: laptopAvailable === true,
-          operating_system: operatingSystem,
-          internet_available: internetAvailable === true,
-          program: programName,
-          preferred_batch: preferredBatch,
-          demo_date: demoDate || null,
-          demo_time_slot: demoTimeSlot || null,
-          consent_project_based: consentProject,
-          consent_communication: consentComm,
-          consent_terms_privacy: consentTerms,
-          status: finalStatus,
-        });
-
-      if (regError) throw regError;
-
-      const regList = await supabase.from("registrations").select("*");
-      const savedReg = regList.data?.find((r: any) => r.student_id === savedStudent.id) || { registration_id: `STARK-2026-${Math.floor(1000 + Math.random() * 9000)}` };
-
-      if (finalStatus === "waiting_list") {
-        await supabase.from("leads").insert({
-          parent_name: parentName,
-          email_address: parentEmail,
-          mobile_number: mobileNumber,
-          student_name: studentName,
-          student_age: parseInt(studentAge, 10),
-          program: programName,
-          preferred_batch: preferredBatch,
-          status: "waiting_list",
-        });
-      }
-
-      await sendWelcomeEmail(parentEmail, parentName, savedReg.registration_id);
-
-      const whatsappPayload = {
-        studentName,
-        studentAge: parseInt(studentAge, 10),
-        parentName,
-        phone: whatsappNumber,
-        program: programName,
-        batch: preferredBatch
-      };
-      await postWhatsAppWebhook(whatsappPayload);
-
-      setSuccessData({
-        registrationId: savedReg.registration_id,
-        studentName,
-        parentName,
-        phone: whatsappNumber,
-        program: programName,
-        batch: preferredBatch,
-        isWaitlist: isWaitlistOnly
-      });
-
-      toast.success(isWaitlistOnly ? "Waitlist registration successful!" : "Enrollment registered successfully!");
-      setActiveStep(8);
-
-    } catch (err: any) {
-      console.error(err);
-      toast.error(err.message || "An error occurred during registration. Please check your data.");
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const resetForm = () => {
-    setStudentName(""); setStudentAge(""); setStudentDob("");
-    setSchoolName(""); setGradeClass(""); setGender("");
-    setParentName(""); setMobileNumber(""); setWhatsappNumber("");
-    setSameAsMobile(false); setParentEmail(""); setOccupation(""); setCompanyName("");
-    setLearningTools({ scratch: false, python: false, chatgpt: false, roboticsKits: false, none: false });
-    setTechInterests([]); setLaptopAvailable(null); setOperatingSystem("");
-    setInternetAvailable(null); setPreferredBatch(""); setDemoDate("");
-    setDemoTimeSlot(""); setConsentProject(false); setConsentComm(false);
-    setConsentTerms(false); setSuccessData(null); setIsWaitlistOnly(false);
-    setActiveStep(1); setIsModalOpen(false);
-  };
-
-  const triggerOpenForm = (waitlistDirect = false) => {
-    setIsWaitlistOnly(waitlistDirect);
-    setIsModalOpen(true);
-    setActiveStep(1);
-  };
-
-  const getMinDateString = () => {
-    const today = new Date();
-    return today.toISOString().split("T")[0];
-  };
-
   // ──────────────────────────────────────────────────────
   // RENDER
   // ──────────────────────────────────────────────────────
   return (
     <div className="min-h-screen bg-slate-950 relative overflow-hidden text-foreground">
       <Navbar />
+      {!isSupabaseConfigured && <DemoModeBanner />}
 
       {/* 3D Immersive background scene */}
-      <FutureAiClubScene isIntro={isIntro} />
-
-      {/* ══════════════════════════════════════════════════ */}
-      {/* ENTRY INTRO OVERLAY                                */}
-      {/* ══════════════════════════════════════════════════ */}
-      <AnimatePresence>
-        {isIntro && (
-          <motion.div
-            initial={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.5 }}
-            className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-slate-950/95 backdrop-blur-md text-center p-6"
-          >
-            <div className="max-w-md mx-auto space-y-6">
-              <motion.h1
-                initial={{ opacity: 0, y: -25 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.1 }}
-                className="text-4xl md:text-5xl font-bold tracking-tight font-display text-white"
-              >
-                FUTURE AI CLUB
-              </motion.h1>
-              <motion.p
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.3 }}
-                className="text-cyan-400 font-semibold tracking-wider uppercase text-sm font-display"
-              >
-                Future Inventions Start Here
-              </motion.p>
-
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.4, delay: 0.5 }}
-                className="flex gap-4 justify-center pt-8"
-              >
-                <Button
-                  onClick={() => setIsIntro(false)}
-                  className="bg-cyan-500 hover:bg-cyan-600 text-slate-950 font-bold px-6 py-2.5 rounded-lg transition-all"
-                >
-                  Continue
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => setIsIntro(false)}
-                  className="border-slate-700 text-slate-300 hover:text-white hover:border-slate-500"
-                >
-                  Skip Animation
-                </Button>
-              </motion.div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <FutureAiClubScene isIntro={false} />
 
       {/* ══════════════════════════════════════════════════ */}
       {/* HERO SECTION                                       */}
       {/* ══════════════════════════════════════════════════ */}
-      <section className="relative pt-32 pb-20 container mx-auto px-6 z-10 flex flex-col items-center justify-center min-h-[90vh] text-center">
-        <div className="max-w-4xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6 }}
-            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-900/80 border border-cyan-500/30 text-cyan-400 mb-8 font-display text-xs font-semibold tracking-wider uppercase"
-          >
-            <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
-            <span>Community Interest List Now Open</span>
-          </motion.div>
-
-          <motion.h1
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-5xl md:text-7xl font-bold tracking-tight font-display mb-6 leading-tight text-white"
-          >
-            Future Inventions{" "}
-            <span className="bg-gradient-to-r from-cyan-400 via-sky-400 to-amber-500 bg-clip-text text-transparent">
-              Start Here
-            </span>
-          </motion.h1>
-
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="text-lg md:text-xl text-slate-300 max-w-2xl mx-auto mb-10 leading-relaxed font-sans"
-          >
-            We&apos;re exploring the possibility of building a community where curious people can learn AI, coding,
-            creativity, and technology together. Open to students, parents, professionals, and lifelong learners.
-          </motion.p>
-
-          {/* Trust Indicators */}
-          <motion.div
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-            className="flex justify-center gap-6 mt-2 mb-10 text-slate-400 text-sm flex-wrap font-display font-medium"
-          >
-            <span className="flex items-center gap-1.5">
-              <CheckCircle2 className="text-cyan-400 w-4 h-4" /> All Ages Welcome
-            </span>
-            <span className="flex items-center gap-1.5">
-              <CheckCircle2 className="text-cyan-400 w-4 h-4" /> No Experience Needed
-            </span>
-            <span className="flex items-center gap-1.5">
-              <CheckCircle2 className="text-cyan-400 w-4 h-4" /> Free Discovery Workshop Planned
-            </span>
-          </motion.div>
-
-          {/* Action CTAs */}
-          <motion.div
-            initial={{ opacity: 0, y: 25 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-            className="flex flex-col sm:flex-row gap-5 justify-center items-center"
-          >
-            <Button
-              size="lg"
-              onClick={() => setIsInterestModalOpen(true)}
-              className="bg-cyan-500 hover:bg-cyan-600 text-slate-950 font-bold text-lg px-8 py-6 rounded-lg w-full sm:w-auto transition-all duration-300 transform hover:scale-105 shadow-[0_0_25px_rgba(6,182,212,0.4)]"
+      <section className="relative pt-32 pb-20 container mx-auto px-6 z-10">
+        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center max-w-6xl mx-auto">
+          <div className="text-center lg:text-left">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.6 }}
+              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-900/80 border border-cyan-500/30 text-cyan-400 mb-8 font-display text-xs font-semibold tracking-wider uppercase"
             >
-              Join the Interest List
-              <ArrowRight className="ml-2 w-5 h-5" />
-            </Button>
-            <Button
-              variant="outline"
-              size="lg"
-              onClick={scrollToWhyThisExists}
-              className="border-slate-800 text-slate-300 hover:text-white hover:bg-slate-900/40 font-semibold text-lg px-8 py-6 rounded-lg w-full sm:w-auto transition-all duration-300"
+              <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
+              <span>Community Interest List Now Open</span>
+            </motion.div>
+
+            <motion.h1
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+              className="text-5xl md:text-7xl font-bold tracking-tight font-display mb-6 leading-tight text-white"
             >
-              Learn More
-            </Button>
+              Future Inventions{" "}
+              <span className="bg-gradient-to-r from-cyan-400 via-sky-400 to-amber-500 bg-clip-text text-transparent">
+                Start Here
+              </span>
+            </motion.h1>
+
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="text-lg md:text-xl text-slate-300 max-w-xl mx-auto lg:mx-0 mb-10 leading-relaxed font-sans"
+            >
+              People like you, learning AI, coding, and creativity together.
+            </motion.p>
+
+            {/* Action CTAs */}
+            <motion.div
+              initial={{ opacity: 0, y: 25 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              className="flex flex-col sm:flex-row gap-5 justify-center lg:justify-start items-center"
+            >
+              <Button
+                size="lg"
+                onClick={() => setIsInterestModalOpen(true)}
+                className="bg-cyan-500 hover:bg-cyan-600 text-slate-950 font-bold text-lg px-8 py-6 rounded-lg w-full sm:w-auto transition-all duration-300 transform hover:scale-105 shadow-[0_0_25px_rgba(6,182,212,0.4)]"
+              >
+                Become an Early Explorer
+                <ArrowRight className="ml-2 w-5 h-5" />
+              </Button>
+              <Button
+                variant="outline"
+                size="lg"
+                onClick={scrollToWhyThisExists}
+                className="border-slate-800 text-slate-300 hover:text-white hover:bg-slate-900/40 font-semibold text-lg px-8 py-6 rounded-lg w-full sm:w-auto transition-all duration-300"
+              >
+                Learn More
+              </Button>
+            </motion.div>
+
+            {/* Micro Trust Bar */}
+            <motion.div
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+              className="flex justify-center lg:justify-start gap-6 mt-8 text-slate-400 text-sm flex-wrap font-display font-medium"
+            >
+              <span className="flex items-center gap-1.5">
+                <CheckCircle2 className="text-cyan-400 w-4 h-4" /> All Ages Welcome
+              </span>
+              <span className="flex items-center gap-1.5">
+                <CheckCircle2 className="text-cyan-400 w-4 h-4" /> No Experience Needed
+              </span>
+              <span className="flex items-center gap-1.5">
+                <CheckCircle2 className="text-cyan-400 w-4 h-4" /> Community Driven
+              </span>
+              <span className="flex items-center gap-1.5">
+                <CheckCircle2 className="text-cyan-400 w-4 h-4" /> Free Discovery Workshop Planned
+              </span>
+            </motion.div>
+          </div>
+
+          {/* Floating hero image panel */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1, y: [0, -14, 0] }}
+            transition={{ opacity: { duration: 0.7, delay: 0.2 }, scale: { duration: 0.7, delay: 0.2 }, y: { duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 } }}
+            className="relative"
+          >
+            <div className="absolute -inset-4 bg-gradient-to-tr from-cyan-500/15 to-amber-500/10 rounded-[2rem] blur-2xl pointer-events-none" />
+            <SmartImage
+              src={IMAGES.heroCommunityImage}
+              alt="Students, parents, and professionals learning together around laptops"
+              className="relative aspect-[4/5] sm:aspect-[5/4] lg:aspect-[4/5] rounded-3xl border border-cyan-500/20 shadow-2xl"
+            />
+            <div className="absolute bottom-4 left-4 right-4 flex items-center gap-3 p-3 rounded-xl bg-slate-950/70 backdrop-blur-md border border-slate-800/80">
+              <span className="w-9 h-9 rounded-lg bg-cyan-500/15 flex items-center justify-center shrink-0">
+                <Sparkles className="w-4 h-4 text-cyan-400" />
+              </span>
+              <span className="text-xs text-slate-300">People like you, exploring AI together.</span>
+            </div>
           </motion.div>
         </div>
       </section>
 
       {/* ══════════════════════════════════════════════════ */}
-      {/* WHY THIS PAGE EXISTS                               */}
+      {/* WHY WE'RE EXPLORING THIS                           */}
       {/* ══════════════════════════════════════════════════ */}
-      <section
-        id="why-this-exists"
-        className="py-24 relative z-10 border-t border-slate-900/60 bg-slate-950/60 backdrop-blur-sm"
-      >
-        <div className="container mx-auto px-6 max-w-4xl text-center">
-          <h2 className="text-3xl md:text-5xl font-bold font-display tracking-tight text-white mb-6">
-            Why This Page Exists
-          </h2>
-          <div className="w-20 h-1 bg-gradient-to-r from-cyan-500 to-amber-500 mx-auto mb-10 rounded-full" />
-
-          <div className="p-8 rounded-2xl bg-slate-900/30 border border-slate-800/80 backdrop-blur-md space-y-6">
-            <p className="text-lg md:text-xl text-slate-300 leading-relaxed font-sans">
-              Before launching workshops, we want to understand whether there is enough community interest.
-            </p>
-            <p className="text-base md:text-lg text-slate-400 leading-relaxed font-sans">
-              Future AI Club is currently an idea in exploration. If enough people are interested, we&apos;ll
-              organize our first free discovery workshop.
-            </p>
+      <section id="why-this-exists" className="py-24 relative z-10 border-t border-slate-900/60 bg-slate-950/60 backdrop-blur-sm">
+        <div className="container mx-auto px-6 max-w-5xl">
+          <div className="grid md:grid-cols-2 gap-10 items-center">
+            <SmartImage
+              src={IMAGES.communityMeetupImage}
+              alt="A small group discussing ideas together"
+              className="aspect-[4/3] rounded-2xl border border-slate-800/80 order-last md:order-none"
+            />
+            <div>
+              <h2 className="text-3xl md:text-5xl font-bold font-display tracking-tight text-white mb-4">
+                A Vision for the Future
+              </h2>
+              <div className="w-20 h-1 bg-gradient-to-r from-cyan-500 to-amber-500 mb-6 rounded-full" />
+              <p className="text-lg text-slate-300 leading-relaxed font-sans">
+                AI is changing how people learn and create — before organizing workshops, we want to see if
+                enough curious people would like to explore it together.
+              </p>
+            </div>
           </div>
         </div>
       </section>
@@ -537,32 +325,23 @@ export default function FutureAiClub() {
       {/* ══════════════════════════════════════════════════ */}
       <section className="py-24 relative z-10 border-t border-slate-900/60 bg-slate-950/40 backdrop-blur-sm">
         <div className="container mx-auto px-6 max-w-5xl">
-          <div className="text-center mb-16">
+          <div className="text-center mb-12">
             <h2 className="text-3xl md:text-5xl font-bold font-display tracking-tight text-white">
-              Who Might Be Interested?
+              A Community for Curious Minds
             </h2>
             <div className="w-20 h-1 bg-gradient-to-r from-cyan-500 to-amber-500 mx-auto mt-4 rounded-full" />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-5">
             {[
-              { title: "Students", desc: "Young learners who want to build creative tech projects early on.", icon: <GraduationCap className="w-6 h-6 text-cyan-400" /> },
-              { title: "Parents", desc: "Parents hoping to introduce their kids to future technology tools productively.", icon: <Users className="w-6 h-6 text-amber-500" /> },
-              { title: "Working Professionals", desc: "Individuals looking to upskill and explore cutting-edge productivity tools.", icon: <Terminal className="w-6 h-6 text-cyan-400" /> },
-              { title: "Technology Enthusiasts", desc: "Hobbyists wanting to collaborate and discuss technology trends.", icon: <Sparkles className="w-6 h-6 text-amber-500" /> },
-              { title: "Curious Beginners", desc: "Anyone completely new to coding, starting their tech learning journey.", icon: <Code className="w-6 h-6 text-cyan-400" /> },
-              { title: "Lifelong Learners", desc: "Active minds looking to experiment, learn, and explore new tools.", icon: <Brain className="w-6 h-6 text-amber-500" /> },
+              { label: "Students", image: IMAGES.studentsLearningImage },
+              { label: "Parents", image: IMAGES.parentLearningImage },
+              { label: "Working Professionals", image: IMAGES.professionalsImage },
+              { label: "Technology Enthusiasts", image: IMAGES.techEnthusiastsImage },
+              { label: "Curious Beginners", image: IMAGES.curiousBeginnersImage },
+              { label: "Lifelong Learners", image: IMAGES.lifelongLearnersImage },
             ].map((card, idx) => (
-              <div
-                key={idx}
-                className="p-6 rounded-xl bg-slate-900/20 border border-slate-800/80 hover:border-cyan-500/20 transition-all duration-300 hover:translate-y-[-4px] backdrop-blur-md group"
-              >
-                <div className="mb-4 p-2.5 bg-slate-950/60 border border-slate-800/80 rounded-lg w-fit group-hover:scale-110 transition-transform">
-                  {card.icon}
-                </div>
-                <h3 className="text-xl font-bold font-display text-white mb-2">{card.title}</h3>
-                <p className="text-slate-400 text-sm leading-relaxed">{card.desc}</p>
-              </div>
+              <ImageCard key={card.label} image={card.image} label={card.label} idx={idx} />
             ))}
           </div>
         </div>
@@ -578,7 +357,7 @@ export default function FutureAiClub() {
               Exploratory Tracks
             </span>
             <h2 className="text-3xl md:text-5xl font-bold font-display tracking-tight text-white">
-              What We Hope To Explore Together
+              Areas We&apos;ll Explore Together
             </h2>
             <div className="w-20 h-1 bg-gradient-to-r from-cyan-500 to-amber-500 mx-auto mt-4 rounded-full" />
           </div>
@@ -608,51 +387,6 @@ export default function FutureAiClub() {
       </section>
 
       {/* ══════════════════════════════════════════════════ */}
-      {/* STARTING SMALL                                     */}
-      {/* ══════════════════════════════════════════════════ */}
-      <section className="py-24 relative z-10 border-t border-slate-900/60 bg-slate-950/40 backdrop-blur-sm">
-        <div className="container mx-auto px-6 max-w-5xl">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-            <div className="lg:col-span-5 space-y-6">
-              <span className="text-amber-500 font-display text-sm font-semibold tracking-wider uppercase block">
-                Our Philosophy
-              </span>
-              <h2 className="text-3xl md:text-5xl font-bold font-display tracking-tight text-white">
-                Starting Small
-              </h2>
-              <div className="w-20 h-1 bg-gradient-to-r from-cyan-500 to-amber-500 rounded-full" />
-              <p className="text-slate-300 leading-relaxed font-sans text-base md:text-lg">
-                We&apos;re intentionally starting small. The goal is to create a welcoming community where people
-                can learn, explore, and build together.
-              </p>
-              <p className="text-slate-400 leading-relaxed font-sans text-sm md:text-base">
-                Future workshops will be shaped by the interests of early members.
-              </p>
-            </div>
-
-            <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-3 gap-5">
-              {[
-                { title: "Small Group Learning", desc: "Collaborate in tight, high-focus cohorts with individual feedback.", icon: <Users className="w-5 h-5 text-cyan-400" /> },
-                { title: "Community Driven", desc: "Curriculums driven by questions and project ideas from early signups.", icon: <Brain className="w-5 h-5 text-amber-500" /> },
-                { title: "Practical Workshops", desc: "Spend course hours active on building rather than watching lectures.", icon: <Code className="w-5 h-5 text-cyan-400" /> },
-              ].map((card, idx) => (
-                <div
-                  key={idx}
-                  className="p-5 rounded-xl bg-slate-900/30 border border-slate-800 hover:border-cyan-500/20 transition-all duration-300 flex flex-col justify-between"
-                >
-                  <div>
-                    <div className="mb-4 p-2 bg-slate-950/60 rounded-lg w-fit">{card.icon}</div>
-                    <h3 className="text-base font-bold font-display text-white mb-2 leading-snug">{card.title}</h3>
-                  </div>
-                  <p className="text-slate-400 text-xs leading-relaxed mt-2">{card.desc}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ══════════════════════════════════════════════════ */}
       {/* WHAT HAPPENS NEXT — 5-STEP TIMELINE                */}
       {/* ══════════════════════════════════════════════════ */}
       <section className="py-24 relative z-10 border-t border-slate-900/60 bg-slate-950/60 backdrop-blur-sm">
@@ -662,7 +396,7 @@ export default function FutureAiClub() {
               The Roadmap
             </span>
             <h2 className="text-3xl md:text-5xl font-bold font-display tracking-tight text-white">
-              What Happens Next?
+              Your Journey Starts Here
             </h2>
             <div className="w-20 h-1 bg-gradient-to-r from-cyan-500 to-amber-500 mx-auto mt-4 rounded-full" />
             <p className="text-slate-400 mt-4 max-w-md mx-auto text-sm">
@@ -716,7 +450,7 @@ export default function FutureAiClub() {
                 <div className="flex items-center gap-2">
                   <div className="w-2.5 h-2.5 rounded-full bg-cyan-500 animate-pulse" />
                   <span className="font-display font-semibold text-cyan-400 text-sm tracking-wider uppercase">
-                    Join the Interest List
+                    Become an Early Explorer
                   </span>
                 </div>
                 <button
@@ -791,6 +525,26 @@ export default function FutureAiClub() {
                         <option value="College Student" className="bg-slate-950 text-white">College Student</option>
                         <option value="Parent" className="bg-slate-950 text-white">Parent</option>
                         <option value="Working Professional" className="bg-slate-950 text-white">Working Professional</option>
+                        <option value="Other" className="bg-slate-950 text-white">Other</option>
+                      </select>
+                    </div>
+
+                    {/* Community */}
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
+                        Which Community Do You Belong To? *
+                      </label>
+                      <select
+                        required
+                        value={interestCommunity}
+                        onChange={(e) => setInterestCommunity(e.target.value)}
+                        className="w-full bg-slate-900/60 border border-slate-800 rounded-lg p-3 text-white focus:outline-none focus:border-cyan-500 transition-colors"
+                      >
+                        <option value="" className="bg-slate-950 text-slate-500">Select your community...</option>
+                        <option value="Prestige Eden Park" className="bg-slate-950 text-white">Prestige Eden Park</option>
+                        <option value="Prestige Avalon Park" className="bg-slate-950 text-white">Prestige Avalon Park</option>
+                        <option value="Prestige Glenbrook" className="bg-slate-950 text-white">Prestige Glenbrook</option>
+                        <option value="Prestige High Fields" className="bg-slate-950 text-white">Prestige High Fields</option>
                         <option value="Other" className="bg-slate-950 text-white">Other</option>
                       </select>
                     </div>
@@ -889,7 +643,7 @@ export default function FutureAiClub() {
                         disabled={isInterestSubmitting}
                         className="w-full bg-gradient-to-r from-cyan-500 to-amber-500 text-slate-950 font-bold hover:scale-[1.02] transition-transform py-6 text-base shadow-[0_0_20px_rgba(245,158,11,0.2)]"
                       >
-                        {isInterestSubmitting ? "Submitting..." : "Join the Interest List"}
+                        {isInterestSubmitting ? "Submitting..." : "Become an Early Explorer"}
                       </Button>
                     </div>
                   </form>
@@ -898,30 +652,38 @@ export default function FutureAiClub() {
                   <motion.div
                     initial={{ scale: 0.95, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
-                    className="text-center space-y-6 py-6"
+                    transition={{ duration: 0.4 }}
+                    className="text-center space-y-6 py-6 px-2 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10"
                   >
-                    <div className="w-16 h-16 bg-emerald-500/10 border border-emerald-500/30 rounded-full flex items-center justify-center mx-auto text-emerald-400 text-3xl font-bold">
-                      ✓
-                    </div>
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ type: "spring", stiffness: 200, damping: 15, delay: 0.1 }}
+                      className="w-16 h-16 bg-emerald-500/10 border border-emerald-500/30 rounded-full flex items-center justify-center mx-auto text-emerald-400"
+                    >
+                      <CheckCircle2 className="w-8 h-8" />
+                    </motion.div>
 
                     <div className="space-y-3">
                       <h3 className="text-3xl font-bold font-display text-white">Thank You</h3>
                       <p className="text-slate-300 text-base max-w-md mx-auto leading-relaxed">
-                        Thank you for your interest.
+                        Thank you for your interest in Future AI Club.
                       </p>
                       <p className="text-slate-400 text-sm max-w-md mx-auto leading-relaxed">
-                        We&apos;re currently exploring whether there is enough community interest to launch Future
-                        AI Club. We&apos;ll keep you informed about future workshops and community events.
+                        We&apos;re currently exploring whether there is enough community interest to launch
+                        workshops and learning events.
+                      </p>
+                      <p className="text-slate-400 text-sm max-w-md mx-auto leading-relaxed">
+                        We&apos;ll keep you informed about future discovery workshops and community activities.
                       </p>
                     </div>
 
                     <div className="pt-6">
                       <Button
-                        type="button"
-                        onClick={resetInterestForm}
+                        asChild
                         className="bg-cyan-500 hover:bg-cyan-600 text-slate-950 font-bold px-8 py-3 rounded-lg transition-colors"
                       >
-                        Close
+                        <Link to="/">Return to Homepage</Link>
                       </Button>
                     </div>
                   </motion.div>
@@ -931,182 +693,6 @@ export default function FutureAiClub() {
           </div>
         )}
       </AnimatePresence>
-
-      {/* ══════════════════════════════════════════════════════════════════
-          FUTURE COHORT REGISTRATION - TEMPORARILY DISABLED
-          All original enrollment UI is preserved below.
-          To re-enable, remove the {false && (<>...</>)} wrapper.
-          ══════════════════════════════════════════════════════════════════ */}
-      {false && (
-        <>
-          {/* ── Old Futuristic Background ── */}
-          <div className="absolute inset-0 grid-pattern opacity-30 z-0 pointer-events-none" />
-          <div className="absolute top-1/4 left-1/3 w-[500px] h-[500px] bg-cyan-500/10 rounded-full blur-[150px] animate-pulse-glow z-0 pointer-events-none" />
-          <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-amber-500/10 rounded-full blur-[150px] animate-pulse-glow z-0 pointer-events-none" style={{ animationDelay: "1.5s" }} />
-
-          {/* ── Old Hero Section ── */}
-          <section className="relative pt-32 pb-20 container mx-auto px-6 z-10 flex flex-col items-center justify-center min-h-[90vh]">
-            <div className="max-w-4xl mx-auto text-center">
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.6 }}
-                className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-950/80 border border-cyan-500/30 text-cyan-400 mb-8 font-display text-sm font-semibold tracking-wider glow-effect"
-              >
-                <Sparkles className="w-4 h-4 text-cyan-400" />
-                <span>FUTURE STARKS ARE HERE</span>
-              </motion.div>
-
-              <motion.h1
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.1 }}
-                className="text-5xl md:text-7xl font-bold tracking-tight font-display mb-6 leading-tight"
-              >
-                Build AI, Games, Robots &{" "}
-                <span className="bg-gradient-to-r from-cyan-400 via-sky-400 to-amber-500 bg-clip-text text-transparent">
-                  Future Technologies
-                </span>
-              </motion.h1>
-
-              <motion.p
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.2 }}
-                className="text-xl text-muted-foreground max-w-2xl mx-auto mb-12"
-              >
-                A premium hands-on AI, Coding & Robotics Academy for creative kids aged 8–17. Empower your child
-                to create, invent, and lead.
-              </motion.p>
-
-              <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.3 }}
-                className="flex flex-col sm:flex-row gap-5 justify-center items-center"
-              >
-                <Button
-                  size="lg"
-                  onClick={() => triggerOpenForm(false)}
-                  className="bg-cyan-500 hover:bg-cyan-600 text-slate-950 font-bold text-lg px-8 py-6 rounded-lg w-full sm:w-auto transition-all duration-300 transform hover:scale-105 shadow-[0_0_25px_rgba(6,182,212,0.4)]"
-                >
-                  Book Free Demo Class
-                  <ArrowRight className="ml-2 w-5 h-5" />
-                </Button>
-                <Button
-                  variant="outline"
-                  size="lg"
-                  onClick={() => triggerOpenForm(true)}
-                  className="border-amber-500/50 hover:border-amber-500 text-amber-500 hover:bg-amber-500/10 font-semibold text-lg px-8 py-6 rounded-lg w-full sm:w-auto transition-all duration-300"
-                >
-                  Join Waiting List
-                </Button>
-              </motion.div>
-
-              <div className="flex justify-center gap-12 mt-16 text-muted-foreground text-sm flex-wrap">
-                <span className="flex items-center gap-2"><CheckCircle2 className="text-cyan-400 w-4 h-4" /> Learn</span>
-                <span className="flex items-center gap-2"><CheckCircle2 className="text-cyan-400 w-4 h-4" /> Build</span>
-                <span className="flex items-center gap-2"><CheckCircle2 className="text-cyan-400 w-4 h-4" /> Invent</span>
-              </div>
-            </div>
-          </section>
-
-          {/* ── Old Trust & Methodology Section ── */}
-          <section className="py-24 bg-slate-950/40 relative z-10 border-y border-slate-900/60">
-            <div className="container mx-auto px-6">
-              <div className="text-center mb-16">
-                <h2 className="text-3xl md:text-5xl font-bold font-display tracking-tight text-white">
-                  Why Parents Trust <span className="text-cyan-400">Stark Academy</span>
-                </h2>
-                <div className="w-24 h-1 bg-gradient-to-r from-cyan-500 to-amber-500 mx-auto mt-4 rounded-full" />
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                {[
-                  { icon: <Brain className="w-8 h-8 text-cyan-400" />, title: "Build Real AI Projects", desc: "Kids learn neural networks, LLMs, and train customized AI agents like ChatGPT assistants." },
-                  { icon: <Code className="w-8 h-8 text-amber-500" />, title: "Hands-on Coding", desc: "Transition smoothly from visual programming in Scratch to professional text-based Python syntax." },
-                  { icon: <Cpu className="w-8 h-8 text-cyan-400" />, title: "Robotics Kits", desc: "Integrate hardware and sensors, assembling intelligent microcontrollers to solve physical world tasks." },
-                  { icon: <Award className="w-8 h-8 text-amber-500" />, title: "Certified Innovation", desc: "Receive official graduation credentials, portfolio support, and showcases on our global platform." },
-                  { icon: <Gamepad2 className="w-8 h-8 text-cyan-400" />, title: "Game Development", desc: "Design interactive 2D & 3D environments, learning structural variables and mathematical layouts." },
-                  { icon: <Terminal className="w-8 h-8 text-amber-500" />, title: "Future Skills", desc: "Logical structure, critical diagnostics, data analytics, and presentation layouts." },
-                  { icon: <Users className="w-8 h-8 text-cyan-400" />, title: "Community Learning", desc: "Collaborate in student clubs, brainstorm in hardware guilds, and partner on team builds." },
-                  { icon: <GraduationCap className="w-8 h-8 text-amber-500" />, title: "Demo Day Showcases", desc: "Pitch projects live to mentors and experts during graduation demo showcases." },
-                ].map((feature, i) => (
-                  <div key={i} className="p-6 rounded-xl bg-slate-900/40 border border-slate-800 hover:border-cyan-500/30 transition-all duration-300 hover:translate-y-[-4px] backdrop-blur-md group">
-                    <div className="mb-4 p-3 bg-slate-950/60 rounded-lg w-fit group-hover:scale-110 transition-transform">{feature.icon}</div>
-                    <h3 className="text-xl font-bold font-display text-white mb-2">{feature.title}</h3>
-                    <p className="text-muted-foreground text-sm leading-relaxed">{feature.desc}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </section>
-
-          {/* ── Old Student Showcases Section ── */}
-          <section className="py-24 relative z-10">
-            <div className="container mx-auto px-6">
-              <div className="text-center mb-16">
-                <h2 className="text-3xl md:text-5xl font-bold font-display tracking-tight">
-                  Future Inventions <span className="bg-gradient-to-r from-cyan-400 to-amber-500 bg-clip-text text-transparent">Start Here</span>
-                </h2>
-                <p className="text-muted-foreground mt-4 max-w-xl mx-auto">Explore some of the award-winning projects engineered by our students aged 8-17.</p>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                {[
-                  { title: "StarkBot Mark I", type: "Robotics / Hardware", builder: "Arjun S. (Age 12)", desc: "An ultrasonic sensor obstacle-avoiding vehicle that navigates rooms independently. Built with Arduino C++.", image: "🤖" },
-                  { title: "Jarvis Junior Assistant", type: "Artificial Intelligence", builder: "Pooja R. (Age 14)", desc: "A custom fine-tuned assistant chatbot trained to index and summarize school notes. Integrated with OpenAI API via Python.", image: "💬" },
-                  { title: "Quantum Racer 3D", type: "Game Engineering", builder: "Rohit K. (Age 9)", desc: "A physics-based racing game featuring custom tracks and acceleration variables. Built with Scratch & JavaScript elements.", image: "🚀" },
-                ].map((project, idx) => (
-                  <div key={idx} className="rounded-xl overflow-hidden bg-slate-950/60 border border-slate-800 hover:border-amber-500/30 transition-all duration-300 flex flex-col group">
-                    <div className="h-48 bg-slate-900 flex items-center justify-center text-6xl border-b border-slate-900 group-hover:bg-slate-800/60 transition-colors">{project.image}</div>
-                    <div className="p-6 flex-grow flex flex-col">
-                      <span className="text-xs font-semibold text-cyan-400 tracking-wider uppercase mb-1">{project.type}</span>
-                      <h3 className="text-xl font-bold font-display text-white mb-2">{project.title}</h3>
-                      <p className="text-muted-foreground text-sm flex-grow mb-4">{project.desc}</p>
-                      <div className="pt-4 border-t border-slate-900 text-xs text-slate-400 font-medium">By {project.builder}</div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </section>
-
-          {/* ── Old Multi-step Registration Wizard Modal ── */}
-          <AnimatePresence>
-            {isModalOpen && (
-              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-4 overflow-y-auto">
-                <motion.div
-                  initial={{ scale: 0.95, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  exit={{ scale: 0.95, opacity: 0 }}
-                  className="bg-slate-950 border border-cyan-500/40 rounded-2xl w-full max-w-2xl overflow-hidden flex flex-col shadow-[0_0_50px_rgba(6,182,212,0.15)] max-h-[90vh]"
-                >
-                  <div className="bg-slate-900/60 px-6 py-4 border-b border-cyan-500/20 flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 rounded-full bg-cyan-500 animate-pulse" />
-                      <span className="font-display font-semibold text-cyan-400 text-sm tracking-wider uppercase">STARK REGISTRATION INITIATED</span>
-                    </div>
-                    {activeStep < 8 && <span className="text-xs text-muted-foreground font-display font-semibold">STEP {activeStep} OF 7</span>}
-                    <button onClick={resetForm} className="text-muted-foreground hover:text-white transition-colors font-bold text-lg">✕</button>
-                  </div>
-
-                  {activeStep < 8 && (
-                    <div className="w-full bg-slate-900 h-1">
-                      <div className="bg-gradient-to-r from-cyan-400 to-amber-500 h-full transition-all duration-300" style={{ width: `${(activeStep / 7) * 100}%` }} />
-                    </div>
-                  )}
-
-                  <div className="p-8 overflow-y-auto flex-grow">
-                    <form onSubmit={handleSubmit} className="space-y-6">
-                      {/* All 7 steps + success step are preserved here. */}
-                      {/* Re-enable this block to restore the full registration wizard. */}
-                    </form>
-                  </div>
-                </motion.div>
-              </div>
-            )}
-          </AnimatePresence>
-        </>
-      )}
 
       <Footer />
     </div>

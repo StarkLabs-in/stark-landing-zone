@@ -71,6 +71,7 @@ interface MockLead {
   student_age?: number;
   program?: string;
   preferred_batch?: string;
+  community?: string;
   status: string;
   created_at: string;
 }
@@ -238,85 +239,111 @@ if (!isSupabaseConfigured) {
   seedMockData();
 }
 
+// Performs a mock insert synchronously and returns it in the same { data, error }
+// shape Supabase would, so it can be wrapped in a thenable/builder for chaining.
+function performMockInsert(table: string, payload: any) {
+  if (table === "parents") {
+    const list = getLocalStorage<MockParent[]>("stark_mock_parents", []);
+    const items = Array.isArray(payload) ? payload : [payload];
+    const newItems = items.map(item => ({
+      id: item.id || crypto.randomUUID(),
+      created_at: new Date().toISOString(),
+      ...item
+    }));
+    list.push(...newItems);
+    setLocalStorage("stark_mock_parents", list);
+    return { data: Array.isArray(payload) ? newItems : newItems[0], error: null };
+  }
+
+  if (table === "students") {
+    const list = getLocalStorage<MockStudent[]>("stark_mock_students", []);
+    const items = Array.isArray(payload) ? payload : [payload];
+    const newItems = items.map(item => ({
+      id: item.id || crypto.randomUUID(),
+      created_at: new Date().toISOString(),
+      ...item
+    }));
+    list.push(...newItems);
+    setLocalStorage("stark_mock_students", list);
+    return { data: Array.isArray(payload) ? newItems : newItems[0], error: null };
+  }
+
+  if (table === "registrations") {
+    const list = getLocalStorage<MockRegistration[]>("stark_mock_registrations", []);
+    const items = Array.isArray(payload) ? payload : [payload];
+
+    const newItems = items.map(item => {
+      // Generate STARK registration ID
+      const currentYear = new Date().getFullYear();
+      const yearStr = String(currentYear);
+      const thisYearRegs = list.filter(r => r.registration_id?.startsWith(`STARK-${yearStr}-`));
+      const maxSeq = thisYearRegs.reduce((max, r) => {
+        const parts = r.registration_id.split("-");
+        const seq = parseInt(parts[2] || "0", 10);
+        return seq > max ? seq : max;
+      }, 0);
+
+      const nextSeq = maxSeq + 1;
+      const regId = `STARK-${yearStr}-${String(nextSeq).padStart(4, "0")}`;
+
+      return {
+        id: item.id || crypto.randomUUID(),
+        registration_id: regId,
+        status: item.status || "confirmed",
+        created_at: new Date().toISOString(),
+        ...item
+      };
+    });
+
+    list.push(...newItems);
+    setLocalStorage("stark_mock_registrations", list);
+    return { data: Array.isArray(payload) ? newItems : newItems[0], error: null };
+  }
+
+  if (table === "leads") {
+    const list = getLocalStorage<MockLead[]>("stark_mock_leads", []);
+    const items = Array.isArray(payload) ? payload : [payload];
+    const newItems = items.map(item => ({
+      id: item.id || crypto.randomUUID(),
+      created_at: new Date().toISOString(),
+      status: "waiting_list",
+      ...item
+    }));
+    list.push(...newItems);
+    setLocalStorage("stark_mock_leads", list);
+    return { data: Array.isArray(payload) ? newItems : newItems[0], error: null };
+  }
+
+  return { data: null, error: { message: `Table ${table} not recognized in mock DB` } };
+}
+
 // Mock Database API wrapper
 const mockDatabase = {
   from(table: string) {
     return {
-      async insert(payload: any) {
-        // Handle inserts depending on tables
-        if (table === "parents") {
-          const list = getLocalStorage<MockParent[]>("stark_mock_parents", []);
-          const items = Array.isArray(payload) ? payload : [payload];
-          const newItems = items.map(item => ({
-            id: item.id || crypto.randomUUID(),
-            created_at: new Date().toISOString(),
-            ...item
-          }));
-          list.push(...newItems);
-          setLocalStorage("stark_mock_parents", list);
-          return { data: Array.isArray(payload) ? newItems : newItems[0], error: null };
-        }
-
-        if (table === "students") {
-          const list = getLocalStorage<MockStudent[]>("stark_mock_students", []);
-          const items = Array.isArray(payload) ? payload : [payload];
-          const newItems = items.map(item => ({
-            id: item.id || crypto.randomUUID(),
-            created_at: new Date().toISOString(),
-            ...item
-          }));
-          list.push(...newItems);
-          setLocalStorage("stark_mock_students", list);
-          return { data: Array.isArray(payload) ? newItems : newItems[0], error: null };
-        }
-
-        if (table === "registrations") {
-          const list = getLocalStorage<MockRegistration[]>("stark_mock_registrations", []);
-          const items = Array.isArray(payload) ? payload : [payload];
-          
-          const newItems = items.map(item => {
-            // Generate STARK registration ID
-            const currentYear = new Date().getFullYear();
-            const yearStr = String(currentYear);
-            const thisYearRegs = list.filter(r => r.registration_id?.startsWith(`STARK-${yearStr}-`));
-            const maxSeq = thisYearRegs.reduce((max, r) => {
-              const parts = r.registration_id.split("-");
-              const seq = parseInt(parts[2] || "0", 10);
-              return seq > max ? seq : max;
-            }, 0);
-            
-            const nextSeq = maxSeq + 1;
-            const regId = `STARK-${yearStr}-${String(nextSeq).padStart(4, "0")}`;
-
+      // Mirrors supabase-js: insert() returns a builder that can either be
+      // awaited directly, or chained with .select().single() to read back
+      // the inserted row (e.g. to get a DB-generated id/registration_id).
+      insert(payload: any) {
+        const result = performMockInsert(table, payload);
+        return {
+          then(resolve: any, reject?: any) {
+            return Promise.resolve(result).then(resolve, reject);
+          },
+          select(_columns?: string) {
             return {
-              id: item.id || crypto.randomUUID(),
-              registration_id: regId,
-              status: item.status || "confirmed",
-              created_at: new Date().toISOString(),
-              ...item
+              then(resolve: any, reject?: any) {
+                return Promise.resolve(result).then(resolve, reject);
+              },
+              single() {
+                return Promise.resolve({
+                  data: Array.isArray(result.data) ? result.data[0] : result.data,
+                  error: result.error,
+                });
+              },
             };
-          });
-
-          list.push(...newItems);
-          setLocalStorage("stark_mock_registrations", list);
-          return { data: Array.isArray(payload) ? newItems : newItems[0], error: null };
-        }
-
-        if (table === "leads") {
-          const list = getLocalStorage<MockLead[]>("stark_mock_leads", []);
-          const items = Array.isArray(payload) ? payload : [payload];
-          const newItems = items.map(item => ({
-            id: item.id || crypto.randomUUID(),
-            created_at: new Date().toISOString(),
-            status: "waiting_list",
-            ...item
-          }));
-          list.push(...newItems);
-          setLocalStorage("stark_mock_leads", list);
-          return { data: Array.isArray(payload) ? newItems : newItems[0], error: null };
-        }
-
-        return { data: null, error: { message: `Table ${table} not recognized in mock DB` } };
+          },
+        };
       },
 
       select(columns = "*") {

@@ -18,15 +18,16 @@ import CustomCursor from "./components/CustomCursor";
 import PageLoader from "./components/PageLoader";
 import ScrollProgress from "./components/ScrollProgress";
 
+const queryClient = new QueryClient();
+
+// Reset scroll position on every route change for a polished SPA feel.
 const ScrollToTop = () => {
   const { pathname } = useLocation();
   useEffect(() => {
-    window.scrollTo(0, 0);
+    window.scrollTo({ top: 0, behavior: "instant" as ScrollBehavior });
   }, [pathname]);
   return null;
 };
-
-const queryClient = new QueryClient();
 
 const App = () => {
   return (
@@ -45,7 +46,8 @@ const App = () => {
             <Route path="/products/starkledger" element={<StarkLedger />} />
             <Route path="/products/competitive-habit-tracker" element={<CompetitiveHabitTracker />} />
             <Route path="/products/neural-tarot" element={<NeuralTarot />} />
-            <Route path="/products/future-ai-club" element={<FutureAiClubProduct />} />
+            {/* Premium detailed page — parked for later once we validate interest. Use /future-ai-club for now. */}
+            {/* <Route path="/products/future-ai-club" element={<FutureAiClubProduct />} /> */}
             <Route path="/future-ai-club" element={<FutureAiClub />} />
             <Route path="/admin" element={<AdminLogin />} />
             <Route path="/admin/dashboard" element={<AdminDashboard />} />
