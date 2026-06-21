@@ -1,9 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Sparkles, ArrowRight, CheckCircle2,
-  Laptop, ShieldCheck, MessageSquare,
-  Brain, Code, Cpu, Terminal, GraduationCap, Users
+  Sparkles, ArrowRight, CheckCircle2, ImageIcon
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -13,6 +11,97 @@ import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { toast } from "sonner";
 import FutureAiClubScene from "@/components/FutureAiClubScene";
 import DemoModeBanner from "@/components/DemoModeBanner";
+
+/* ------------------------------------------------------------------ */
+/* Centralized image constants — swap any of these for real photos    */
+/* later without touching layout code. Style: people-first,           */
+/* collaborative learning. No robots, hardware kits, or boardrooms.   */
+/* ------------------------------------------------------------------ */
+const IMAGES = {
+  heroCommunityImage: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=900&q=80",
+
+  // Who Might Be Interested
+  studentsLearningImage: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=600&q=80",
+  parentLearningImage: "https://images.unsplash.com/photo-1573164713988-8665fc963095?auto=format&fit=crop&w=600&q=80",
+  professionalsImage: "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=600&q=80",
+  techEnthusiastsImage: "https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?auto=format&fit=crop&w=600&q=80",
+  curiousBeginnersImage: "https://images.unsplash.com/photo-1605379399642-870262d3d051?auto=format&fit=crop&w=600&q=80",
+  lifelongLearnersImage: "https://images.unsplash.com/photo-1559136555-9303baea8ebd?auto=format&fit=crop&w=600&q=80",
+
+  // What We Hope To Explore Together
+  aiToolsImage: "https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&w=600&q=80",
+  codingWorkshopImage: "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&w=600&q=80",
+  creativeProjectsImage: "https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=600&q=80",
+  websitesImage: "https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?auto=format&fit=crop&w=600&q=80",
+  problemSolvingImage: "https://images.unsplash.com/photo-1573497620053-ea5300f94f21?auto=format&fit=crop&w=600&q=80",
+  technologyDiscussionImage: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=600&q=80",
+
+  // Community Gallery
+  galleryWorkshop: "https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=700&q=80",
+  galleryParentLearning: "https://images.unsplash.com/photo-1515187029135-18ee286d815b?auto=format&fit=crop&w=700&q=80",
+  galleryStudentsBuilding: "https://images.unsplash.com/photo-1600880292203-757bb62b4baf?auto=format&fit=crop&w=700&q=80",
+  galleryCollaboration: "https://images.unsplash.com/photo-1551434678-e076c223a692?auto=format&fit=crop&w=700&q=80",
+  galleryTechDiscussion: "https://images.unsplash.com/photo-1531538606174-0f90ff5dce83?auto=format&fit=crop&w=700&q=80",
+  galleryProjectShowcase: "https://images.unsplash.com/photo-1543269865-cbf427effbad?auto=format&fit=crop&w=700&q=80",
+
+  // What Happens Next
+  stepSignupImage: "https://images.unsplash.com/photo-1556761175-4b46a572b786?auto=format&fit=crop&w=500&q=80",
+  stepWorkshopImage: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=500&q=80",
+  stepCommunityImage: "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=500&q=80",
+  stepBuildImage: "https://images.unsplash.com/photo-1600880292089-90a7e086ee0c?auto=format&fit=crop&w=500&q=80",
+  projectShowcaseImage: "https://images.unsplash.com/photo-1543269865-cbf427effbad?auto=format&fit=crop&w=500&q=80",
+
+  // Starting Small trust banner
+  communityMeetupImage: "https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=1400&q=80",
+};
+
+/* ------------------------------------------------------------------ */
+/* Image with a graceful on-brand fallback so the layout never breaks  */
+/* if a URL fails — shows a dark gradient + icon instead.              */
+/* ------------------------------------------------------------------ */
+function SmartImage({ src, alt, className = "" }: { src: string; alt: string; className?: string }) {
+  const [failed, setFailed] = useState(false);
+  return (
+    <div className={`relative overflow-hidden bg-slate-900 ${className}`}>
+      {!failed ? (
+        <img
+          src={src}
+          alt={alt}
+          loading="lazy"
+          onError={() => setFailed(true)}
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+      ) : (
+        <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-950 to-slate-900">
+          <ImageIcon className="w-8 h-8 text-cyan-500/40" />
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* Visual-led card: image + short label, used for audience & topic grids. */
+function ImageCard({ image, label, idx = 0 }: { image: string; label: string; idx?: number }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.35, delay: idx * 0.05 }}
+      className="group relative rounded-2xl overflow-hidden border border-slate-800/80 hover:border-cyan-500/40 transition-colors duration-300"
+    >
+      <SmartImage
+        src={image}
+        alt={label}
+        className="aspect-[4/3] [&>img]:transition-transform [&>img]:duration-500 group-hover:[&>img]:scale-110"
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-slate-950/95 via-slate-950/20 to-transparent" />
+      <span className="absolute bottom-3 left-4 right-4 font-display font-semibold text-white text-sm sm:text-base">
+        {label}
+      </span>
+    </motion.div>
+  );
+}
 
 export default function FutureAiClub() {
   // Page SEO tags injection
@@ -124,84 +213,106 @@ export default function FutureAiClub() {
       {/* ══════════════════════════════════════════════════ */}
       {/* HERO SECTION                                       */}
       {/* ══════════════════════════════════════════════════ */}
-      <section className="relative pt-32 pb-20 container mx-auto px-6 z-10 flex flex-col items-center justify-center min-h-[90vh] text-center">
-        <div className="max-w-4xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6 }}
-            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-900/80 border border-cyan-500/30 text-cyan-400 mb-8 font-display text-xs font-semibold tracking-wider uppercase"
-          >
-            <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
-            <span>Community Interest List Now Open</span>
-          </motion.div>
-
-          <motion.h1
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-5xl md:text-7xl font-bold tracking-tight font-display mb-6 leading-tight text-white"
-          >
-            Future Inventions{" "}
-            <span className="bg-gradient-to-r from-cyan-400 via-sky-400 to-amber-500 bg-clip-text text-transparent">
-              Start Here
-            </span>
-          </motion.h1>
-
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="text-lg md:text-xl text-slate-300 max-w-2xl mx-auto mb-10 leading-relaxed font-sans"
-          >
-            We&apos;re exploring the possibility of building a community where curious people can learn AI, coding,
-            creativity, and technology together. Open to students, parents, professionals, and lifelong learners.
-          </motion.p>
-
-          {/* Action CTAs */}
-          <motion.div
-            initial={{ opacity: 0, y: 25 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-            className="flex flex-col sm:flex-row gap-5 justify-center items-center"
-          >
-            <Button
-              size="lg"
-              onClick={() => setIsInterestModalOpen(true)}
-              className="bg-cyan-500 hover:bg-cyan-600 text-slate-950 font-bold text-lg px-8 py-6 rounded-lg w-full sm:w-auto transition-all duration-300 transform hover:scale-105 shadow-[0_0_25px_rgba(6,182,212,0.4)]"
+      <section className="relative pt-32 pb-20 container mx-auto px-6 z-10">
+        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center max-w-6xl mx-auto">
+          <div className="text-center lg:text-left">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.6 }}
+              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-900/80 border border-cyan-500/30 text-cyan-400 mb-8 font-display text-xs font-semibold tracking-wider uppercase"
             >
-              Join the Interest List
-              <ArrowRight className="ml-2 w-5 h-5" />
-            </Button>
-            <Button
-              variant="outline"
-              size="lg"
-              onClick={scrollToWhyThisExists}
-              className="border-slate-800 text-slate-300 hover:text-white hover:bg-slate-900/40 font-semibold text-lg px-8 py-6 rounded-lg w-full sm:w-auto transition-all duration-300"
-            >
-              Learn More
-            </Button>
-          </motion.div>
+              <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
+              <span>Community Interest List Now Open</span>
+            </motion.div>
 
-          {/* Micro Trust Bar */}
+            <motion.h1
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+              className="text-5xl md:text-7xl font-bold tracking-tight font-display mb-6 leading-tight text-white"
+            >
+              Future Inventions{" "}
+              <span className="bg-gradient-to-r from-cyan-400 via-sky-400 to-amber-500 bg-clip-text text-transparent">
+                Start Here
+              </span>
+            </motion.h1>
+
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="text-lg md:text-xl text-slate-300 max-w-xl mx-auto lg:mx-0 mb-10 leading-relaxed font-sans"
+            >
+              People like you, learning AI, coding, and creativity together.
+            </motion.p>
+
+            {/* Action CTAs */}
+            <motion.div
+              initial={{ opacity: 0, y: 25 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              className="flex flex-col sm:flex-row gap-5 justify-center lg:justify-start items-center"
+            >
+              <Button
+                size="lg"
+                onClick={() => setIsInterestModalOpen(true)}
+                className="bg-cyan-500 hover:bg-cyan-600 text-slate-950 font-bold text-lg px-8 py-6 rounded-lg w-full sm:w-auto transition-all duration-300 transform hover:scale-105 shadow-[0_0_25px_rgba(6,182,212,0.4)]"
+              >
+                Join the Interest List
+                <ArrowRight className="ml-2 w-5 h-5" />
+              </Button>
+              <Button
+                variant="outline"
+                size="lg"
+                onClick={scrollToWhyThisExists}
+                className="border-slate-800 text-slate-300 hover:text-white hover:bg-slate-900/40 font-semibold text-lg px-8 py-6 rounded-lg w-full sm:w-auto transition-all duration-300"
+              >
+                Learn More
+              </Button>
+            </motion.div>
+
+            {/* Micro Trust Bar */}
+            <motion.div
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+              className="flex justify-center lg:justify-start gap-6 mt-8 text-slate-400 text-sm flex-wrap font-display font-medium"
+            >
+              <span className="flex items-center gap-1.5">
+                <CheckCircle2 className="text-cyan-400 w-4 h-4" /> All Ages Welcome
+              </span>
+              <span className="flex items-center gap-1.5">
+                <CheckCircle2 className="text-cyan-400 w-4 h-4" /> No Experience Needed
+              </span>
+              <span className="flex items-center gap-1.5">
+                <CheckCircle2 className="text-cyan-400 w-4 h-4" /> Community Driven
+              </span>
+              <span className="flex items-center gap-1.5">
+                <CheckCircle2 className="text-cyan-400 w-4 h-4" /> Free Discovery Workshop Planned
+              </span>
+            </motion.div>
+          </div>
+
+          {/* Floating hero image panel */}
           <motion.div
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-            className="flex justify-center gap-6 mt-8 text-slate-400 text-sm flex-wrap font-display font-medium"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1, y: [0, -14, 0] }}
+            transition={{ opacity: { duration: 0.7, delay: 0.2 }, scale: { duration: 0.7, delay: 0.2 }, y: { duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 } }}
+            className="relative"
           >
-            <span className="flex items-center gap-1.5">
-              <CheckCircle2 className="text-cyan-400 w-4 h-4" /> All Ages Welcome
-            </span>
-            <span className="flex items-center gap-1.5">
-              <CheckCircle2 className="text-cyan-400 w-4 h-4" /> No Experience Needed
-            </span>
-            <span className="flex items-center gap-1.5">
-              <CheckCircle2 className="text-cyan-400 w-4 h-4" /> Community Driven
-            </span>
-            <span className="flex items-center gap-1.5">
-              <CheckCircle2 className="text-cyan-400 w-4 h-4" /> Free Discovery Workshop Planned
-            </span>
+            <div className="absolute -inset-4 bg-gradient-to-tr from-cyan-500/15 to-amber-500/10 rounded-[2rem] blur-2xl pointer-events-none" />
+            <SmartImage
+              src={IMAGES.heroCommunityImage}
+              alt="Students, parents, and professionals learning together around laptops"
+              className="relative aspect-[4/5] sm:aspect-[5/4] lg:aspect-[4/5] rounded-3xl border border-cyan-500/20 shadow-2xl"
+            />
+            <div className="absolute bottom-4 left-4 right-4 flex items-center gap-3 p-3 rounded-xl bg-slate-950/70 backdrop-blur-md border border-slate-800/80">
+              <span className="w-9 h-9 rounded-lg bg-cyan-500/15 flex items-center justify-center shrink-0">
+                <Sparkles className="w-4 h-4 text-cyan-400" />
+              </span>
+              <span className="text-xs text-slate-300">People like you, exploring AI together.</span>
+            </div>
           </motion.div>
         </div>
       </section>
@@ -209,46 +320,24 @@ export default function FutureAiClub() {
       {/* ══════════════════════════════════════════════════ */}
       {/* WHY WE'RE EXPLORING THIS                           */}
       {/* ══════════════════════════════════════════════════ */}
-      <section className="py-24 relative z-10 border-t border-slate-900/60 bg-slate-950/60 backdrop-blur-sm">
-        <div className="container mx-auto px-6 max-w-4xl text-center">
-          <h2 className="text-3xl md:text-5xl font-bold font-display tracking-tight text-white mb-6">
-            Why We&apos;re Exploring This
-          </h2>
-          <div className="w-20 h-1 bg-gradient-to-r from-cyan-500 to-amber-500 mx-auto mb-10 rounded-full" />
-
-          <div className="p-8 rounded-2xl bg-slate-900/30 border border-slate-800/80 backdrop-blur-md space-y-6">
-            <p className="text-lg md:text-xl text-slate-300 leading-relaxed font-sans">
-              AI is changing how people learn, work, and create.
-            </p>
-            <p className="text-base md:text-lg text-slate-400 leading-relaxed font-sans">
-              Future AI Club is an experiment to see whether curious students, parents, professionals,
-              and technology enthusiasts would like a space to explore these topics together.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* ══════════════════════════════════════════════════ */}
-      {/* WHY THIS PAGE EXISTS                               */}
-      {/* ══════════════════════════════════════════════════ */}
-      <section
-        id="why-this-exists"
-        className="py-24 relative z-10 border-t border-slate-900/60 bg-slate-950/60 backdrop-blur-sm"
-      >
-        <div className="container mx-auto px-6 max-w-4xl text-center">
-          <h2 className="text-3xl md:text-5xl font-bold font-display tracking-tight text-white mb-6">
-            Why This Page Exists
-          </h2>
-          <div className="w-20 h-1 bg-gradient-to-r from-cyan-500 to-amber-500 mx-auto mb-10 rounded-full" />
-
-          <div className="p-8 rounded-2xl bg-slate-900/30 border border-slate-800/80 backdrop-blur-md space-y-6">
-            <p className="text-lg md:text-xl text-slate-300 leading-relaxed font-sans">
-              Before launching workshops, we want to understand whether there is enough community interest.
-            </p>
-            <p className="text-base md:text-lg text-slate-400 leading-relaxed font-sans">
-              Future AI Club is currently an idea in exploration. If enough people are interested, we&apos;ll
-              organize our first free discovery workshop.
-            </p>
+      <section id="why-this-exists" className="py-24 relative z-10 border-t border-slate-900/60 bg-slate-950/60 backdrop-blur-sm">
+        <div className="container mx-auto px-6 max-w-5xl">
+          <div className="grid md:grid-cols-2 gap-10 items-center">
+            <SmartImage
+              src={IMAGES.communityMeetupImage}
+              alt="A small group discussing ideas together"
+              className="aspect-[4/3] rounded-2xl border border-slate-800/80 order-last md:order-none"
+            />
+            <div>
+              <h2 className="text-3xl md:text-5xl font-bold font-display tracking-tight text-white mb-4">
+                Why We&apos;re Exploring This
+              </h2>
+              <div className="w-20 h-1 bg-gradient-to-r from-cyan-500 to-amber-500 mb-6 rounded-full" />
+              <p className="text-lg text-slate-300 leading-relaxed font-sans">
+                AI is changing how people learn and create — before organizing workshops, we want to see if
+                enough curious people would like to explore it together.
+              </p>
+            </div>
           </div>
         </div>
       </section>
@@ -258,32 +347,23 @@ export default function FutureAiClub() {
       {/* ══════════════════════════════════════════════════ */}
       <section className="py-24 relative z-10 border-t border-slate-900/60 bg-slate-950/40 backdrop-blur-sm">
         <div className="container mx-auto px-6 max-w-5xl">
-          <div className="text-center mb-16">
+          <div className="text-center mb-12">
             <h2 className="text-3xl md:text-5xl font-bold font-display tracking-tight text-white">
               Who Might Be Interested?
             </h2>
             <div className="w-20 h-1 bg-gradient-to-r from-cyan-500 to-amber-500 mx-auto mt-4 rounded-full" />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-5">
             {[
-              { title: "Students", desc: "Young learners who want to build creative tech projects early on.", icon: <GraduationCap className="w-6 h-6 text-cyan-400" /> },
-              { title: "Parents", desc: "Parents hoping to introduce their kids to future technology tools productively.", icon: <Users className="w-6 h-6 text-amber-500" /> },
-              { title: "Working Professionals", desc: "Individuals looking to upskill and explore cutting-edge productivity tools.", icon: <Terminal className="w-6 h-6 text-cyan-400" /> },
-              { title: "Technology Enthusiasts", desc: "Hobbyists wanting to collaborate and discuss technology trends.", icon: <Sparkles className="w-6 h-6 text-amber-500" /> },
-              { title: "Curious Beginners", desc: "Anyone completely new to coding, starting their tech learning journey.", icon: <Code className="w-6 h-6 text-cyan-400" /> },
-              { title: "Lifelong Learners", desc: "Active minds looking to experiment, learn, and explore new tools.", icon: <Brain className="w-6 h-6 text-amber-500" /> },
+              { label: "Students", image: IMAGES.studentsLearningImage },
+              { label: "Parents", image: IMAGES.parentLearningImage },
+              { label: "Working Professionals", image: IMAGES.professionalsImage },
+              { label: "Technology Enthusiasts", image: IMAGES.techEnthusiastsImage },
+              { label: "Curious Beginners", image: IMAGES.curiousBeginnersImage },
+              { label: "Lifelong Learners", image: IMAGES.lifelongLearnersImage },
             ].map((card, idx) => (
-              <div
-                key={idx}
-                className="p-6 rounded-xl bg-slate-900/20 border border-slate-800/80 hover:border-cyan-500/20 transition-all duration-300 hover:translate-y-[-4px] backdrop-blur-md group"
-              >
-                <div className="mb-4 p-2.5 bg-slate-950/60 border border-slate-800/80 rounded-lg w-fit group-hover:scale-110 transition-transform">
-                  {card.icon}
-                </div>
-                <h3 className="text-xl font-bold font-display text-white mb-2">{card.title}</h3>
-                <p className="text-slate-400 text-sm leading-relaxed">{card.desc}</p>
-              </div>
+              <ImageCard key={card.label} image={card.image} label={card.label} idx={idx} />
             ))}
           </div>
         </div>
@@ -294,7 +374,7 @@ export default function FutureAiClub() {
       {/* ══════════════════════════════════════════════════ */}
       <section className="py-24 relative z-10 border-t border-slate-900/60 bg-slate-950/60 backdrop-blur-sm">
         <div className="container mx-auto px-6 max-w-5xl">
-          <div className="text-center mb-16">
+          <div className="text-center mb-12">
             <span className="text-cyan-500 font-display text-sm font-semibold tracking-wider uppercase mb-2 block">
               Exploratory Tracks
             </span>
@@ -304,82 +384,94 @@ export default function FutureAiClub() {
             <div className="w-20 h-1 bg-gradient-to-r from-cyan-500 to-amber-500 mx-auto mt-4 rounded-full" />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-5">
             {[
-              { title: "AI Tools", desc: "Learning to use AI systems for writing, image creation, and project acceleration.", icon: <Brain className="w-6 h-6 text-cyan-400" /> },
-              { title: "Coding Basics", desc: "Getting comfortable with fundamental scripting, structures, and systems.", icon: <Code className="w-6 h-6 text-amber-500" /> },
-              { title: "Creative Projects", desc: "Applying computational methods to design interactive games and digital arts.", icon: <Cpu className="w-6 h-6 text-cyan-400" /> },
-              { title: "Websites", desc: "Understanding the layouts and architecture required to share ideas online.", icon: <Laptop className="w-6 h-6 text-amber-500" /> },
-              { title: "Problem Solving", desc: "Breaking down complex logical tasks into automated step-by-step operations.", icon: <ShieldCheck className="w-6 h-6 text-cyan-400" /> },
-              { title: "Technology Discussions", desc: "Exploring safety guidelines, emerging frameworks, and digital community concepts.", icon: <MessageSquare className="w-6 h-6 text-amber-500" /> },
+              { label: "AI Tools", image: IMAGES.aiToolsImage },
+              { label: "Coding Basics", image: IMAGES.codingWorkshopImage },
+              { label: "Creative Projects", image: IMAGES.creativeProjectsImage },
+              { label: "Websites", image: IMAGES.websitesImage },
+              { label: "Problem Solving", image: IMAGES.problemSolvingImage },
+              { label: "Technology Discussions", image: IMAGES.technologyDiscussionImage },
             ].map((card, idx) => (
-              <div
-                key={idx}
-                className="p-6 rounded-xl bg-slate-900/20 border border-slate-800/80 hover:border-cyan-500/20 transition-all duration-300 hover:translate-y-[-4px] backdrop-blur-md group"
-              >
-                <div className="mb-4 p-2.5 bg-slate-950/60 border border-slate-800/80 rounded-lg w-fit group-hover:scale-110 transition-transform">
-                  {card.icon}
-                </div>
-                <h3 className="text-xl font-bold font-display text-white mb-2">{card.title}</h3>
-                <p className="text-slate-400 text-sm leading-relaxed">{card.desc}</p>
-              </div>
+              <ImageCard key={card.label} image={card.image} label={card.label} idx={idx} />
             ))}
           </div>
         </div>
       </section>
 
       {/* ══════════════════════════════════════════════════ */}
-      {/* STARTING SMALL                                     */}
+      {/* COMMUNITY GALLERY                                  */}
       {/* ══════════════════════════════════════════════════ */}
       <section className="py-24 relative z-10 border-t border-slate-900/60 bg-slate-950/40 backdrop-blur-sm">
         <div className="container mx-auto px-6 max-w-5xl">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-            <div className="lg:col-span-5 space-y-6">
-              <span className="text-amber-500 font-display text-sm font-semibold tracking-wider uppercase block">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-5xl font-bold font-display tracking-tight text-white">
+              Imagine What We Could Build Together
+            </h2>
+            <div className="w-20 h-1 bg-gradient-to-r from-cyan-500 to-amber-500 mx-auto mt-4 rounded-full" />
+          </div>
+
+          <div className="columns-2 md:columns-3 gap-4 [&>*]:mb-4">
+            {[
+              { image: IMAGES.galleryWorkshop, caption: "Small workshop group", ratio: "aspect-[4/5]" },
+              { image: IMAGES.galleryParentLearning, caption: "Parent learning AI", ratio: "aspect-square" },
+              { image: IMAGES.galleryStudentsBuilding, caption: "Students building projects", ratio: "aspect-[4/3]" },
+              { image: IMAGES.galleryCollaboration, caption: "People collaborating", ratio: "aspect-square" },
+              { image: IMAGES.galleryTechDiscussion, caption: "Technology discussion", ratio: "aspect-[4/5]" },
+              { image: IMAGES.galleryProjectShowcase, caption: "Project showcase", ratio: "aspect-[4/3]" },
+            ].map((g, idx) => (
+              <motion.div
+                key={g.caption}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, delay: idx * 0.06 }}
+                className="relative rounded-2xl overflow-hidden border border-slate-800/80 break-inside-avoid"
+              >
+                <SmartImage src={g.image} alt={g.caption} className={g.ratio} />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-transparent to-transparent" />
+                <span className="absolute bottom-3 left-3 right-3 px-2.5 py-1.5 rounded-lg bg-white/10 backdrop-blur-md border border-white/10 text-[11px] font-medium text-white">
+                  {g.caption}
+                </span>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ══════════════════════════════════════════════════ */}
+      {/* STARTING SMALL — VISUAL TRUST BANNER               */}
+      {/* ══════════════════════════════════════════════════ */}
+      <section className="py-24 relative z-10 border-t border-slate-900/60 bg-slate-950/40 backdrop-blur-sm">
+        <div className="container mx-auto px-6 max-w-5xl">
+          <div className="relative rounded-3xl overflow-hidden border border-slate-800/80">
+            <SmartImage
+              src={IMAGES.communityMeetupImage}
+              alt="A small group discussion"
+              className="aspect-[16/9] md:aspect-[21/9]"
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-slate-950/95 via-slate-950/70 to-slate-950/30" />
+            <div className="absolute inset-0 flex flex-col items-start justify-center p-8 md:p-14 max-w-lg">
+              <span className="text-amber-500 font-display text-sm font-semibold tracking-wider uppercase mb-3 block">
                 Our Philosophy
               </span>
-              <h2 className="text-3xl md:text-5xl font-bold font-display tracking-tight text-white">
-                Starting Small
+              <h2 className="text-3xl md:text-4xl font-bold font-display tracking-tight text-white mb-4">
+                We&apos;re Intentionally Starting Small
               </h2>
-              <div className="w-20 h-1 bg-gradient-to-r from-cyan-500 to-amber-500 rounded-full" />
-              <p className="text-slate-300 leading-relaxed font-sans text-base md:text-lg">
-                We&apos;re intentionally starting small. Before organizing workshops, we want to understand
-                whether there is enough community interest.
+              <p className="text-slate-300 leading-relaxed font-sans">
+                Future AI Club is being shaped together with its earliest members.
               </p>
-              <p className="text-slate-400 leading-relaxed font-sans text-sm md:text-base">
-                Future AI Club is being shaped together with its early members. The first community
-                participants will help influence future workshops, topics, and events.
-              </p>
-            </div>
-
-            <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-3 gap-5">
-              {[
-                { title: "Small Group Learning", desc: "Collaborate in tight, high-focus cohorts with individual feedback.", icon: <Users className="w-5 h-5 text-cyan-400" /> },
-                { title: "Community Driven", desc: "Curriculums driven by questions and project ideas from early signups.", icon: <Brain className="w-5 h-5 text-amber-500" /> },
-                { title: "Practical Workshops", desc: "Spend course hours active on building rather than watching lectures.", icon: <Code className="w-5 h-5 text-cyan-400" /> },
-              ].map((card, idx) => (
-                <div
-                  key={idx}
-                  className="p-5 rounded-xl bg-slate-900/30 border border-slate-800 hover:border-cyan-500/20 transition-all duration-300 flex flex-col justify-between"
-                >
-                  <div>
-                    <div className="mb-4 p-2 bg-slate-950/60 rounded-lg w-fit">{card.icon}</div>
-                    <h3 className="text-base font-bold font-display text-white mb-2 leading-snug">{card.title}</h3>
-                  </div>
-                  <p className="text-slate-400 text-xs leading-relaxed mt-2">{card.desc}</p>
-                </div>
-              ))}
             </div>
           </div>
         </div>
       </section>
 
       {/* ══════════════════════════════════════════════════ */}
-      {/* WHAT HAPPENS NEXT — 5-STEP TIMELINE                */}
+      {/* WHAT HAPPENS NEXT — VISUAL STEP CARDS               */}
       {/* ══════════════════════════════════════════════════ */}
       <section className="py-24 relative z-10 border-t border-slate-900/60 bg-slate-950/60 backdrop-blur-sm">
         <div className="container mx-auto px-6 max-w-5xl">
-          <div className="text-center mb-16">
+          <div className="text-center mb-12">
             <span className="text-cyan-500 font-display text-sm font-semibold tracking-wider uppercase mb-2 block">
               The Roadmap
             </span>
@@ -387,36 +479,38 @@ export default function FutureAiClub() {
               What Happens Next?
             </h2>
             <div className="w-20 h-1 bg-gradient-to-r from-cyan-500 to-amber-500 mx-auto mt-4 rounded-full" />
-            <p className="text-slate-400 mt-4 max-w-md mx-auto text-sm">
-              Five structured phases to align workshops to real community needs.
-            </p>
           </div>
 
-          <div className="relative">
-            {/* Desktop horizontal track */}
-            <div className="absolute top-8 left-10 right-10 h-0.5 bg-slate-800/80 hidden md:block z-0" />
-
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-8 relative z-10">
-              {[
-                { step: "01", title: "Join Interest List", desc: "Share your roles, preferred schedules, and exploration goals." },
-                { step: "02", title: "Free Discovery Workshop", desc: "If demand is validated, we organise a live interactive session." },
-                { step: "03", title: "Meet the Community", desc: "Collaborate, share profiles, and discuss build projects." },
-                { step: "04", title: "Build Together", desc: "Launch collaborative code sprints and hands-on workshops." },
-                { step: "05", title: "Decide Whether To Continue", desc: "Choose whether you'd like scheduled learning paths." },
-              ].map((item, idx) => (
-                <div key={idx} className="space-y-4 md:text-center group">
-                  <div className="flex items-center md:justify-center gap-4 md:flex-col">
-                    <div className="w-16 h-16 rounded-full bg-slate-900 border-2 border-slate-800 group-hover:border-cyan-500 transition-all flex items-center justify-center font-display font-bold text-lg text-cyan-400 shadow-md">
-                      {item.step}
-                    </div>
-                  </div>
-                  <div className="space-y-2 pl-2 md:pl-0">
-                    <h3 className="text-lg font-bold font-display text-white">{item.title}</h3>
-                    <p className="text-slate-400 text-xs leading-relaxed max-w-xs md:mx-auto">{item.desc}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-5">
+            {[
+              { step: "01", title: "Join Interest List", image: IMAGES.stepSignupImage },
+              { step: "02", title: "Discovery Workshop", image: IMAGES.stepWorkshopImage },
+              { step: "03", title: "Meet Community", image: IMAGES.stepCommunityImage },
+              { step: "04", title: "Build Together", image: IMAGES.stepBuildImage },
+              { step: "05", title: "Continue Learning", image: IMAGES.projectShowcaseImage },
+            ].map((item, idx) => (
+              <motion.div
+                key={item.step}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, delay: idx * 0.08 }}
+                className="group relative rounded-2xl overflow-hidden border border-slate-800/80 hover:border-cyan-500/40 transition-colors duration-300"
+              >
+                <SmartImage
+                  src={item.image}
+                  alt={item.title}
+                  className="aspect-[3/4] [&>img]:transition-transform [&>img]:duration-500 group-hover:[&>img]:scale-110"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/95 via-slate-950/30 to-transparent" />
+                <span className="absolute top-3 left-3 text-[10px] font-mono uppercase tracking-wider text-cyan-400">
+                  Step {item.step}
+                </span>
+                <span className="absolute bottom-3 left-3 right-3 font-display font-semibold text-white text-sm leading-snug">
+                  {item.title}
+                </span>
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>
