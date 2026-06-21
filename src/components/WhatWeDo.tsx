@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { Cpu, Sparkles, Cog, FlaskConical } from "lucide-react";
+import { fadeUp, stagger, inViewProps } from "@/lib/motion";
 
 const services = [
   {
@@ -29,34 +30,37 @@ const WhatWeDo = () => {
     <section id="about" className="py-24 relative">
       <div className="container mx-auto px-6">
         {/* Section Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-16"
-        >
-          <h2 className="font-display text-3xl md:text-5xl font-bold mb-4">
+        <motion.div {...inViewProps} variants={stagger(0.08)} className="text-center mb-16">
+          <motion.div
+            variants={fadeUp}
+            className="inline-block text-xs font-mono uppercase tracking-[0.25em] text-primary mb-4"
+          >
+            What We Do
+          </motion.div>
+          <motion.h2 variants={fadeUp} className="font-display text-3xl md:text-5xl font-bold mb-4">
             What We <span className="gradient-text">Build</span>
-          </h2>
-          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+          </motion.h2>
+          <motion.p variants={fadeUp} className="text-muted-foreground text-lg max-w-2xl mx-auto">
             Starklabs is an AI engineering company focused on building production-grade systems for real-world use cases.
-          </p>
+          </motion.p>
         </motion.div>
 
         {/* Services Grid */}
-        <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-          {services.map((service, index) => (
+        <motion.div
+          {...inViewProps}
+          variants={stagger(0.12)}
+          className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto"
+        >
+          {services.map((service) => (
             <motion.div
               key={service.title}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
+              variants={fadeUp}
+              whileHover={{ y: -6 }}
+              transition={{ type: "spring", stiffness: 300, damping: 20 }}
               className="group"
             >
-              <div className="h-full p-8 rounded-2xl bg-card border border-border hover:border-primary/50 transition-all duration-300 card-glow">
-                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-5 group-hover:bg-primary/20 transition-colors">
+              <div className="h-full p-8 rounded-2xl bg-card border border-border hover:border-primary/50 card-glow">
+                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-5 group-hover:bg-primary/20 group-hover:scale-110 transition-all duration-300">
                   <service.icon className="w-6 h-6 text-primary" />
                 </div>
                 <h3 className="font-display text-xl font-semibold mb-3 text-foreground">
@@ -68,7 +72,7 @@ const WhatWeDo = () => {
               </div>
             </motion.div>
           ))}
-        </div>
+        </motion.div>
       </div>
     </section>
   );

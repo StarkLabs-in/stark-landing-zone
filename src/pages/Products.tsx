@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { ArrowRight, FileText, Target, Stars, Rocket, ArrowLeft } from "lucide-react";
+import { ArrowRight, FileText, Target, Rocket, ArrowLeft, Cpu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -21,11 +21,11 @@ const products = [
     status: "In Development",
   },
   {
-    icon: Stars,
-    title: "Neural Tarot",
-    description: "AI-powered astrology and numerology insights platform. Advanced LLM integration for personalized, meaningful interpretations based on cosmic patterns.",
-    link: "/products/neural-tarot",
-    status: "In Development",
+    icon: Cpu,
+    title: "Future AI Club",
+    description: "An AI & technology learning community where curious minds explore AI, coding, and digital creativity through hands-on workshops. Beginner-friendly and open to all ages.",
+    link: "/products/future-ai-club",
+    status: "Founding Cohort",
   },
   {
     icon: Rocket,

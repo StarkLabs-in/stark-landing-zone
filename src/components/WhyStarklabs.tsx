@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { Wrench, BookOpen, Shield, Users } from "lucide-react";
+import { fadeUp, scaleIn, stagger, inViewProps } from "@/lib/motion";
 
 const reasons = [
   {
@@ -32,35 +33,37 @@ const WhyStarklabs = () => {
 
       <div className="container mx-auto px-6 relative z-10">
         {/* Section Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-16"
-        >
-          <h2 className="font-display text-3xl md:text-5xl font-bold mb-4">
+        <motion.div {...inViewProps} variants={stagger(0.08)} className="text-center mb-16">
+          <motion.div
+            variants={fadeUp}
+            className="inline-block text-xs font-mono uppercase tracking-[0.25em] text-primary mb-4"
+          >
+            Why Choose Us
+          </motion.div>
+          <motion.h2 variants={fadeUp} className="font-display text-3xl md:text-5xl font-bold mb-4">
             Why <span className="gradient-text">Starklabs</span>
-          </h2>
-          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+          </motion.h2>
+          <motion.p variants={fadeUp} className="text-muted-foreground text-lg max-w-2xl mx-auto">
             We don't just build AI—we engineer intelligent systems that work in the real world.
-          </p>
+          </motion.p>
         </motion.div>
 
         {/* Reasons Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
-          {reasons.map((reason, index) => (
-            <motion.div
-              key={reason.title}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="text-center"
-            >
-              <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-5">
+        <motion.div
+          {...inViewProps}
+          variants={stagger(0.12)}
+          className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto"
+        >
+          {reasons.map((reason) => (
+            <motion.div key={reason.title} variants={fadeUp} className="group text-center">
+              <motion.div
+                variants={scaleIn}
+                whileHover={{ rotate: 6, scale: 1.08 }}
+                transition={{ type: "spring", stiffness: 300, damping: 15 }}
+                className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-5 group-hover:bg-primary/20 transition-colors"
+              >
                 <reason.icon className="w-8 h-8 text-primary" />
-              </div>
+              </motion.div>
               <h3 className="font-display text-lg font-semibold mb-2 text-foreground">
                 {reason.title}
               </h3>
@@ -69,7 +72,7 @@ const WhyStarklabs = () => {
               </p>
             </motion.div>
           ))}
-        </div>
+        </motion.div>
       </div>
     </section>
   );

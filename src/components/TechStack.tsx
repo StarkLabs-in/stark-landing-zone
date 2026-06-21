@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { fadeUp, stagger, inViewProps } from "@/lib/motion";
 
 const technologies = [
   "Python",
@@ -9,49 +10,40 @@ const technologies = [
   "Computer Vision",
   "NLP",
   "Cloud-Native",
+  "Vector Databases",
+  "MLOps",
+  "Kubernetes",
+  "Edge AI",
 ];
+
+const Pill = ({ tech }: { tech: string }) => (
+  <span className="px-5 py-2.5 rounded-full bg-secondary border border-border text-foreground font-medium text-sm whitespace-nowrap hover:border-primary/50 hover:bg-primary/10 transition-all cursor-default">
+    {tech}
+  </span>
+);
 
 const TechStack = () => {
   return (
-    <section className="py-20 relative">
+    <section className="py-20 relative overflow-hidden">
       <div className="container mx-auto px-6">
         {/* Section Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-12"
-        >
-          <h2 className="font-display text-2xl md:text-3xl font-bold mb-3">
+        <motion.div {...inViewProps} variants={stagger(0.08)} className="text-center mb-12">
+          <motion.h2 variants={fadeUp} className="font-display text-2xl md:text-3xl font-bold mb-3">
             Technology <span className="gradient-text">Stack</span>
-          </h2>
-          <p className="text-muted-foreground max-w-xl mx-auto">
+          </motion.h2>
+          <motion.p variants={fadeUp} className="text-muted-foreground max-w-xl mx-auto">
             Built on industry-leading tools and frameworks
-          </p>
+          </motion.p>
         </motion.div>
+      </div>
 
-        {/* Tech Pills */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className="flex flex-wrap justify-center gap-3 max-w-4xl mx-auto"
-        >
-          {technologies.map((tech, index) => (
-            <motion.div
-              key={tech}
-              initial={{ opacity: 0, scale: 0.9 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.3, delay: index * 0.05 }}
-              className="px-5 py-2.5 rounded-full bg-secondary border border-border text-foreground font-medium text-sm hover:border-primary/50 hover:bg-primary/10 transition-all cursor-default"
-            >
-              {tech}
-            </motion.div>
+      {/* Infinite marquee track (duplicated content for a seamless loop) */}
+      <div className="relative marquee-mask">
+        <div className="flex w-max gap-3 animate-marquee hover:[animation-play-state:paused]">
+          {[...technologies, ...technologies].map((tech, i) => (
+            <Pill key={`${tech}-${i}`} tech={tech} />
           ))}
-        </motion.div>
+        </div>
       </div>
     </section>
   );
